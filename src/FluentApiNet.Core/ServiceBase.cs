@@ -90,7 +90,7 @@ namespace FluentApiNet.Core
         private Expression<Func<TEntity, bool>> TransposeFilter(Expression<Func<TModel, bool>> filters)
         {
             var parameter = Expression.Parameter(typeof(TEntity));
-            
+            return null;
         }
     }
 }

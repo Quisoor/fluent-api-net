@@ -43,10 +43,9 @@
   <ItemGroup>
     <Compile Include="Clause.cs" />
     <Compile Include="Evaluator.cs" />
+    <Compile Include="Mapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="package.nuspec" />
+    <Compile Include="Results.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

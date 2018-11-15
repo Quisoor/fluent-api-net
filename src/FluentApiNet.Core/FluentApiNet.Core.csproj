@@ -31,7 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -42,9 +49,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="package.nuspec" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FluentApiNet.Abstract\FluentApiNet.Abstract.csproj">
+      <Project>{0774b5f3-a439-4807-b533-8d748b6770f5}</Project>
+      <Name>FluentApiNet.Abstract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FluentApiNet.EF\FluentApiNet.EF.csproj">
+      <Project>{36e18c13-b037-4288-b4da-016fe410f8be}</Project>
+      <Name>FluentApiNet.EF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FluentApiNet.Tools\FluentApiNet.Tools.csproj">
+      <Project>{1a330564-0412-443f-bfd6-a7ced762d92e}</Project>
+      <Name>FluentApiNet.Tools</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

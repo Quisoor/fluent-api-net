@@ -22,9 +22,7 @@
     <copyright>Copyright 2018 © Aurélien Bretin</copyright>
     <tags> </tags>
     <dependencies>
-      <!--
-      <dependency id="SampleDependency" version="1.0" />
-      -->
+      <dependency id="EntityFramework" version="6.2.0" />
     </dependencies>
   </metadata>
   <files>

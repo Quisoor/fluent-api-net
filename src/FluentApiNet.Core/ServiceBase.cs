@@ -109,26 +109,6 @@ namespace FluentApiNet.Core
             var repositoryProperty = typeof(TContext).GetProperties().Single(x => x.PropertyType.GenericTypeArguments.First() == typeof(TEntity));
             var repository = (DbSet<TEntity>)repositoryProperty.GetValue(Context);
             return repository;
-        }
-
-        /// <summary>
-        /// Transposes the specified query.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns></returns>
-        private List<TModel> Transpose(IQueryable<TEntity> query)
-        {
-            var parameter = Expression.Parameter(typeof(TEntity));
-            var ctor = Expression.New(typeof(TModel));
-            var assignments = new List<MemberAssignment>();
-            foreach(var map in SelectMapping)
-            {
-                var property = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
-                assignments.Add(Expression.Bind(property, map.EntityMember));
-            }
-            var init = Expression.MemberInit(ctor, assignments.ToArray());
-            var select = Expression.Lambda<Func<TEntity, TModel>>(init, parameter);
-            return query.Select(select).ToList();
-        }
+        }       
     }
 }

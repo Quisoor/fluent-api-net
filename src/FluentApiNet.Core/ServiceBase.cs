@@ -1,4 +1,5 @@
 ﻿using FluentApiNet.Abstract;
+using FluentApiNet.Tools;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -12,16 +13,6 @@ namespace FluentApiNet.Core
         where TEntity : class, new()
         where TContext : DbContext
     {
-        /// <summary>
-        /// The default page
-        /// </summary>
-        private const int DEFAULT_PAGE = 1;
-
-        /// <summary>
-        /// The default pagesize
-        /// </summary>
-        private const int DEFAULT_PAGESIZE = 25;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase{TModel, TEntity, TContext}"/> class.
         /// </summary>
@@ -53,7 +44,7 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         public Results<TModel> Get(Expression<Func<TModel, bool>> filters)
         {
-            return this.Get(filters, DEFAULT_PAGE, DEFAULT_PAGESIZE);
+            return this.Get(filters, PaginationTools.DEFAULT_PAGE, PaginationTools.DEFAULT_PAGESIZE);
         }
 
         /// <summary>
@@ -64,7 +55,7 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         public Results<TModel> Get(Expression<Func<TModel, bool>> filters, int? page)
         {
-            return this.Get(filters, page, DEFAULT_PAGESIZE);
+            return this.Get(filters, page, PaginationTools.DEFAULT_PAGESIZE);
         }
 
         /// <summary>
@@ -79,8 +70,8 @@ namespace FluentApiNet.Core
             var results = new Results<TModel>();
 
             // format pagination
-            page = LimitPage(page);
-            pageSize = LimitPageSize(pageSize);
+            page = PaginationTools.LimitPage(page);
+            pageSize = PaginationTools.LimitPageSize(pageSize);
 
             var query = GetQuery(filters);
 
@@ -120,6 +111,11 @@ namespace FluentApiNet.Core
             return repository;
         }
 
+        /// <summary>
+        /// Transposes the specified query.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns></returns>
         private List<TModel> Transpose(IQueryable<TEntity> query)
         {
             var parameter = Expression.Parameter(typeof(TEntity));
@@ -129,45 +125,10 @@ namespace FluentApiNet.Core
             {
                 var property = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
                 assignments.Add(Expression.Bind(property, map.EntityMember));
-
             }
             var init = Expression.MemberInit(ctor, assignments.ToArray());
             var select = Expression.Lambda<Func<TEntity, TModel>>(init, parameter);
             return query.Select(select).ToList();
-        }
-
-        /// <summary>
-        /// Limits the page.
-        /// </summary>
-        /// <param name="page">The page.</param>
-        /// <returns></returns>
-        private int LimitPage(int? page)
-        {
-            if (page.HasValue && page.Value > 0)
-            {
-                return page.Value;
-            }
-            else
-            {
-                return DEFAULT_PAGE;
-            }
-        }
-
-        /// <summary>
-        /// Limits the size of the page.
-        /// </summary>
-        /// <param name="pageSize">Size of the page.</param>
-        /// <returns></returns>
-        private int LimitPageSize(int? pageSize)
-        {
-            if (pageSize.HasValue && pageSize.Value >= 0)
-            {
-                return pageSize.Value;
-            }
-            else
-            {
-                return DEFAULT_PAGESIZE;
-            }
         }
     }
 }

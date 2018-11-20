@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -41,6 +42,35 @@ namespace FluentApiNet.Abstract
         }
 
         /// <summary>
+        /// Dispatches the expression to one of the more specialized visit methods in this class.
+        /// </summary>
+        /// <param name="node">The expression to visit.</param>
+        /// <returns>
+        /// The modified expression, if it or any subexpression was modified; otherwise, returns the original expression.
+        /// </returns>
+        public override Expression Visit(Expression node)
+        {
+            Debug.WriteLine(node.ToString());
+            return base.Visit(node);
+        }
+
+        protected override Expression VisitLambda<T>(Expression<T> node)
+        {
+            Debug.WriteLine(node.ToString());
+            Debug.WriteLine(node.Parameters.ToString());
+            //TODO parameter type to map
+            if (typeof(T) == entityType)
+            {
+                return node.Update(node.Body, node.Parameters);
+            }
+            if (typeof(T) == modelType)
+            {
+                return node.Update(node.Body, node.Parameters);
+            }
+            return base.VisitLambda(node);
+        }
+
+        /// <summary>
         /// Visits the <see cref="T:System.Linq.Expressions.ParameterExpression" />.
         /// </summary>
         /// <param name="node">The expression to visit.</param>
@@ -49,6 +79,7 @@ namespace FluentApiNet.Abstract
         /// </returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
+            Debug.WriteLine(node.ToString());
             if (node.Type == modelType)
             {
                 return Expression.Parameter(entityType);
@@ -69,6 +100,7 @@ namespace FluentApiNet.Abstract
         /// </returns>
         protected override Expression VisitMember(MemberExpression node)
         {
+            Debug.WriteLine(node.ToString());
             if (node.Member.DeclaringType == entityType)
             {
                 return mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember;

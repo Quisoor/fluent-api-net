@@ -65,7 +65,7 @@ namespace FluentApiNet.Core
         /// <param name="page">The page.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <returns></returns>
-        public Results<TModel> Get(Expression<Func<TModel,bool>> filters, int? page, int? pageSize)
+        public Results<TModel> Get(Expression<Func<TModel, bool>> filters, int? page, int? pageSize)
         {
             var results = new Results<TModel>();
 
@@ -82,7 +82,7 @@ namespace FluentApiNet.Core
             query = query.Skip(page.Value - 1 * pageSize.Value).Take(pageSize.Value);
 
             // get the results
-            results.Result = QueryTools.Transpose<TModel,TEntity>(query, SelectMapping);
+            results.Result = QueryTools.Transpose<TModel, TEntity>(query, SelectMapping);
 
             return results;
         }
@@ -96,6 +96,7 @@ namespace FluentApiNet.Core
         {
             var translator = new TranslationVisitor(SelectMapping);
             var query = GetQuery();
+            var where = translator.Visit(filters);
             query = query.Where(Expression.Lambda<Func<TEntity, bool>>(translator.Visit(filters)));
             return query;
         }
@@ -106,9 +107,15 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         private IQueryable<TEntity> GetQuery()
         {
-            var repositoryProperty = typeof(TContext).GetProperties().Single(x => x.PropertyType.GenericTypeArguments.First() == typeof(TEntity));
+            var entityType = typeof(TEntity);
+            var contextProperties = typeof(TContext).GetProperties();
+            var repositoryProperty = typeof(TContext).GetProperties()
+                .Single(p => p.PropertyType.IsGenericType
+                    && p.PropertyType.Name.StartsWith("DbSet")
+                    && p.PropertyType.GetGenericArguments().Length > 0
+                    && p.PropertyType.GetGenericArguments().First() == typeof(TEntity));
             var repository = (DbSet<TEntity>)repositoryProperty.GetValue(Context);
             return repository;
-        }       
+        }
     }
 }

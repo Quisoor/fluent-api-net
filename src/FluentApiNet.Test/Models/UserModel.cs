@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FluentApiNet.Test.Models
+﻿namespace FluentApiNet.Test.Models
 {
     public class UserModel
     {
+        public int IdUser { get; set; }
+        public string UserName { get; set; }
     }
 }

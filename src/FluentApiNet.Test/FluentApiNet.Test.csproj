@@ -39,8 +39,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Effort, Version=2.0.1.0, Culture=neutral, PublicKeyToken=af3a7cee6563bdda, processorArchitecture=MSIL">
-      <HintPath>..\packages\Effort.2.0.1\lib\net45\Effort.dll</HintPath>
+    <Reference Include="Effort, Version=2.0.1.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Effort.EF6.2.0.1\lib\net45\Effort.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
@@ -60,19 +60,26 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\TestDbContext.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\UserService.cs" />
     <Compile Include="Tools\PaginationToolsTest.cs" />
+    <Compile Include="UT\ServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentApiNet.Abstract\FluentApiNet.Abstract.csproj">
+      <Project>{0774B5F3-A439-4807-B533-8D748B6770F5}</Project>
+      <Name>FluentApiNet.Abstract</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FluentApiNet.Core\FluentApiNet.Core.csproj">
       <Project>{ce85a20f-35a7-405e-9b06-87774d16f6fb}</Project>
       <Name>FluentApiNet.Core</Name>

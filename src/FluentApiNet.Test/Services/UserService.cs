@@ -11,8 +11,8 @@ namespace FluentApiNet.Test.Services
         public UserService(TestDbContext context)
         {
             this.Context = context;
-            SelectMapping.Add(Mapping.Init<UserModel, User>(x => x.IdUser, x => x.Id));
-            SelectMapping.Add(Mapping.Init<UserModel, User>(x => x.UserName, x => x.Name));
+            SelectMapping.Add(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity));
+            SelectMapping.Add(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.NameEntity));
         }
     }
 }

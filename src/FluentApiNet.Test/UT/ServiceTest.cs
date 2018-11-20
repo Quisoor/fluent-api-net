@@ -13,10 +13,10 @@ namespace FluentApiNet.Test.UT
         {
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDbContext(connection);
-            context.Users.Add(new Entities.User { Id = 1, Name = "Aurélien" });
+            context.Users.Add(new Entities.User { IdEntity = 1, NameEntity = "Aurélien" });
             context.SaveChanges();
             var service = new UserService(context);
-            var result = service.Get(x => x.IdUser == 1);
+            var result = service.Get(x => x.IdModel == 1);
             Assert.IsNotNull(result);
         }
     }

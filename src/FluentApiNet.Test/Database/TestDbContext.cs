@@ -15,7 +15,7 @@ namespace FluentApiNet.Test.Database
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasIndex(x => x.Id);
+            modelBuilder.Entity<User>().HasKey(x => x.IdEntity);
         }
 
     }

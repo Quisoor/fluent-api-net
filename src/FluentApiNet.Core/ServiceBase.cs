@@ -94,10 +94,10 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         protected IQueryable<TEntity> GetQuery(Expression<Func<TModel, bool>> filters)
         {
-            var translator = new TranslationVisitor(SelectMapping);
+            var translator = new TranslationVisitor<Func<TEntity, bool>>(SelectMapping);
             var query = GetQuery();
-            var where = translator.Visit(filters);
-            query = query.Where(Expression.Lambda<Func<TEntity, bool>>(translator.Visit(filters)));
+            var where = translator.Visit(filters) as LambdaExpression;
+            query = query.Where(Expression.Lambda<Func<TEntity,bool>>(where.Body, Expression.Parameter(typeof(TEntity),"x")));
             return query;
         }
 

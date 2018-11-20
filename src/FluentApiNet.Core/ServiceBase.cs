@@ -82,7 +82,7 @@ namespace FluentApiNet.Core
             query = query.Skip(page.Value - 1 * pageSize.Value).Take(pageSize.Value);
 
             // get the results
-            results.Result = Transpose(query);
+            results.Result = QueryTools.Transpose<TModel,TEntity>(query, SelectMapping);
 
             return results;
         }

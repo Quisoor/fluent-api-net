@@ -68,8 +68,8 @@
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\UserService.cs" />
-    <Compile Include="Tools\PaginationToolsTest.cs" />
-    <Compile Include="UT\ServiceTest.cs" />
+    <Compile Include="UT\Tools\PaginationToolsTest.cs" />
+    <Compile Include="UT\Services\ServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

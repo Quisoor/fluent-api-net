@@ -1,7 +1,7 @@
 ﻿using FluentApiNet.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentApiNet.Test.Tools
+namespace FluentApiNet.Test.UT.Tools
 {
     [TestClass]
     public class PaginationToolsTest

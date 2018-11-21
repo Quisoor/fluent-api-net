@@ -3,7 +3,7 @@ using FluentApiNet.Test.Database;
 using FluentApiNet.Test.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FluentApiNet.Test.UT
+namespace FluentApiNet.Test.UT.services
 {
     [TestClass]
     public class ServiceTest

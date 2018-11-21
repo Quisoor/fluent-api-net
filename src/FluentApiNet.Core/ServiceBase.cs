@@ -79,7 +79,7 @@ namespace FluentApiNet.Core
             results.Count = query.Count();
 
             // apply pagination
-            //TODO query = query.Skip(page.Value - 1 * pageSize.Value).Take(pageSize.Value);
+            query = query.Pagine(page.Value, pageSize.Value);
 
             // get the results
             results.Result = QueryTools.Transpose<TModel, TEntity>(query, Mappings);

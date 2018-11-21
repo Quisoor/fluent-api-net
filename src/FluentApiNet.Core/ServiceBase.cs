@@ -79,7 +79,7 @@ namespace FluentApiNet.Core
             results.Count = query.Count();
 
             // apply pagination
-            query = query.Skip(page.Value - 1 * pageSize.Value).Take(pageSize.Value);
+            //query = query.Skip(page.Value - 1 * pageSize.Value).Take(pageSize.Value);
 
             // get the results
             results.Result = QueryTools.Transpose<TModel, TEntity>(query, SelectMapping);
@@ -94,10 +94,14 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         protected IQueryable<TEntity> GetQuery(Expression<Func<TModel, bool>> filters)
         {
-            var translator = new TranslationVisitor<Func<TEntity, bool>>(SelectMapping);
-            var query = GetQuery();
+            var entryParam = Expression.Parameter(typeof(TEntity), "x");
+            var translator = new TranslationVisitor<Func<TEntity, bool>>(SelectMapping, entryParam);
             var where = translator.Visit(filters) as LambdaExpression;
-            query = query.Where(Expression.Lambda<Func<TEntity,bool>>(where.Body, Expression.Parameter(typeof(TEntity),"x")));
+            var query = GetQuery();
+
+            var groupBy = translator.Visit(SelectMapping.First().EntityMember) as MemberExpression;
+            query = query.Where(Expression.Lambda<Func<TEntity,bool>>(where.Body, entryParam));
+            query = query.OrderBy(Expression.Lambda<Func<TEntity, Int32>>(groupBy, entryParam));
             return query;
         }
 

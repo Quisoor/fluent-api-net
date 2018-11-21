@@ -33,25 +33,34 @@ namespace FluentApiNet.Abstract
         private readonly bool modelToEntity;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TranslationVisitor"/> class.
+        /// The entry parameter
         /// </summary>
-        /// <param name="mappings">The mappings.</param>
-        public TranslationVisitor(List<Mapping> mappings) : this(mappings, true) { }
+        private readonly ParameterExpression entryParameter;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TranslationVisitor"/> class.
+        /// Initializes a new instance of the <see cref="TranslationVisitor{TEntry}"/> class.
         /// </summary>
         /// <param name="mappings">The mappings.</param>
-        public TranslationVisitor(List<Mapping> mappings, bool modelToEntity)
+        /// <param name="entryParameter">The entry parameter.</param>
+        public TranslationVisitor(List<Mapping> mappings, ParameterExpression entryParameter) : this(mappings, entryParameter, true) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TranslationVisitor{TEntry}"/> class.
+        /// </summary>
+        /// <param name="mappings">The mappings.</param>
+        /// <param name="entryParameter">The entry parameter.</param>
+        /// <param name="modelToEntity">if set to <c>true</c> [model to entity].</param>
+        public TranslationVisitor(List<Mapping> mappings, ParameterExpression entryParameter, bool modelToEntity)
         {
             this.mappings = mappings;
             this.modelToEntity = modelToEntity;
+            this.entryParameter = entryParameter;
             if (mappings.Any())
             {
                 entityType = mappings.First().EntityMember.Member.DeclaringType;
                 modelType = mappings.First().ModelMember.Member.DeclaringType;
             }
-        }        
+        }
 
         /// <summary>
         /// Dispatches the expression to one of the more specialized visit methods in this class.
@@ -62,28 +71,24 @@ namespace FluentApiNet.Abstract
         /// </returns>
         public override Expression Visit(Expression node)
         {
-            Debug.WriteLine("Expression : " + node.ToString());
+            Debug.WriteLine("Expression : " + node.ToString() + " [=>] " + base.Visit(node));
             return base.Visit(node);
         }
 
+        /// <summary>
+        /// Visits the children of the <see cref="T:System.Linq.Expressions.Expression`1" />.
+        /// </summary>
+        /// <typeparam name="T">The type of the delegate.</typeparam>
+        /// <param name="node">The expression to visit.</param>
+        /// <returns>
+        /// The modified expression, if it or any subexpression was modified; otherwise, returns the original expression.
+        /// </returns>
         protected override Expression VisitLambda<T>(Expression<T> node)
-        {
-            Debug.WriteLine("Lambda : " + node.ToString());
+        {            
             if (node.Parameters.Count == 1)
             {
                 var parameter = node.Parameters.Single();
-                ParameterExpression param = null;
-                Type target = null;
-                if (parameter.Type == entityType && !modelToEntity)
-                {
-                    param = Expression.Parameter(modelType, parameter.Name);
-                    target = modelType;
-                }
-                else if (parameter.Type == modelType && modelToEntity)
-                {
-                    param = Expression.Parameter(entityType, parameter.Name);
-                    target = entityType;
-                }
+                var param = this.Visit(parameter) as ParameterExpression;
 
                 if (param != null)
                 {
@@ -93,7 +98,7 @@ namespace FluentApiNet.Abstract
                 }
             }
             return base.VisitLambda(node);
-        }        
+        }
 
         /// <summary>
         /// Visits the <see cref="T:System.Linq.Expressions.ParameterExpression" />.
@@ -104,16 +109,7 @@ namespace FluentApiNet.Abstract
         /// </returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            Debug.WriteLine("Parameter : " + node.ToString());
-            if (node.Type == modelType && modelToEntity)
-            {
-                return Expression.Parameter(entityType);
-            }
-            if (node.Type == entityType && !modelToEntity)
-            {
-                return Expression.Parameter(modelType);
-            }
-            return base.VisitParameter(node);
+            return entryParameter;
         }
 
         /// <summary>
@@ -125,16 +121,16 @@ namespace FluentApiNet.Abstract
         /// </returns>
         protected override Expression VisitMember(MemberExpression node)
         {
-            Debug.WriteLine("Member : " + node.ToString());
+            var param = this.Visit(node.Expression) as ParameterExpression;
             if (node.Member.DeclaringType == entityType && !modelToEntity)
             {
-                return mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember;
+                return Expression.MakeMemberAccess(param, mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember.Member);
             }
             if (node.Member.DeclaringType == modelType && modelToEntity)
             {
-                return mappings.Single(x => x.ModelMember.Member.Name == node.Member.Name).EntityMember;
+                return Expression.MakeMemberAccess(param, mappings.Single(x => x.ModelMember.Member.Name == node.Member.Name).EntityMember.Member);
             }
             return base.VisitMember(node);
-        }        
+        }
     }
 }

@@ -18,13 +18,14 @@ namespace FluentApiNet.Tools
         /// <returns>List of model</returns>
         public static List<TModel> Transpose<TModel, TEntity>(IQueryable<TEntity> query, List<Mapping> mappings)
         {
-            var parameter = Expression.Parameter(typeof(TEntity));
+            var parameter = Expression.Parameter(typeof(TEntity), "x");
+            var traductor = new TranslationVisitor<TEntity>(mappings, parameter);
             var ctor = Expression.New(typeof(TModel));
             var assignments = new List<MemberAssignment>();
             foreach (var map in mappings)
             {
-                var property = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
-                assignments.Add(Expression.Bind(property, map.EntityMember));
+                var property = typeof(TModel).GetProperty(map.ModelMember.Member.Name);                
+                assignments.Add(Expression.Bind(property, traductor.Visit(map.ModelMember)));
             }
             var init = Expression.MemberInit(ctor, assignments.ToArray());
             var select = Expression.Lambda<Func<TEntity, TModel>>(init, parameter);

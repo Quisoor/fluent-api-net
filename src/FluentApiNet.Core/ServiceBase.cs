@@ -79,7 +79,7 @@ namespace FluentApiNet.Core
             results.Count = query.Count();
 
             // apply pagination
-            //query = query.Skip(page.Value - 1 * pageSize.Value).Take(pageSize.Value);
+            //TODO query = query.Skip(page.Value - 1 * pageSize.Value).Take(pageSize.Value);
 
             // get the results
             results.Result = QueryTools.Transpose<TModel, TEntity>(query, SelectMapping);
@@ -94,30 +94,36 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         protected IQueryable<TEntity> GetQuery(Expression<Func<TModel, bool>> filters)
         {
-            var entryParam = Expression.Parameter(typeof(TEntity), "x");
-            var translator = new TranslationVisitor<Func<TEntity, bool>>(SelectMapping, entryParam);
+            // define entry parameter
+            var entryParameter = Expression.Parameter(typeof(TEntity), "x");
+            // initialize the translator
+            var translator = new TranslationVisitor<Func<TEntity, bool>>(SelectMapping, entryParameter);
+            // translate filters in where expression
             var where = translator.Visit(filters) as LambdaExpression;
+            // translate and generate order by expression
+            var orderBy = translator.Visit(SelectMapping.First().EntityMember) as MemberExpression;
+            // get basic query of the repository
             var query = GetQuery();
-
-            var groupBy = translator.Visit(SelectMapping.First().EntityMember) as MemberExpression;
-            query = query.Where(Expression.Lambda<Func<TEntity,bool>>(where.Body, entryParam));
-            query = query.OrderBy(Expression.Lambda<Func<TEntity, Int32>>(groupBy, entryParam));
+            // apply the where expression to the query
+            query = query.Where(Expression.Lambda<Func<TEntity,bool>>(where.Body, entryParameter));
+            // apply order by expression to the query
+            query = query.OrderBy(Expression.Lambda<Func<TEntity, Int32>>(orderBy, entryParameter));
             return query;
         }
 
         /// <summary>
         /// Gets the query.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The repository</returns>
         private IQueryable<TEntity> GetQuery()
         {
-            var entityType = typeof(TEntity);
-            var contextProperties = typeof(TContext).GetProperties();
+            // get repository property in the context
             var repositoryProperty = typeof(TContext).GetProperties()
                 .Single(p => p.PropertyType.IsGenericType
                     && p.PropertyType.Name.StartsWith("DbSet")
                     && p.PropertyType.GetGenericArguments().Length > 0
                     && p.PropertyType.GetGenericArguments().First() == typeof(TEntity));
+            // get value of the repository
             var repository = (DbSet<TEntity>)repositoryProperty.GetValue(Context);
             return repository;
         }

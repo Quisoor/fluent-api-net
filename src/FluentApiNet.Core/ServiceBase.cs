@@ -18,7 +18,7 @@ namespace FluentApiNet.Core
         /// </summary>
         public ServiceBase()
         {
-            SelectMapping = new List<Mapping>();
+            Mappings = new List<Mapping>();
         }
 
         /// <summary>
@@ -30,12 +30,12 @@ namespace FluentApiNet.Core
         protected TContext Context { get; set; }
 
         /// <summary>
-        /// Gets or sets the select mapping.
+        /// Gets or sets mapping.
         /// </summary>
         /// <value>
         /// The select mapping.
         /// </value>
-        protected List<Mapping> SelectMapping { get; set; }
+        protected List<Mapping> Mappings { get; private set; }
 
         /// <summary>
         /// Gets the specified filters.
@@ -82,7 +82,7 @@ namespace FluentApiNet.Core
             //TODO query = query.Skip(page.Value - 1 * pageSize.Value).Take(pageSize.Value);
 
             // get the results
-            results.Result = QueryTools.Transpose<TModel, TEntity>(query, SelectMapping);
+            results.Result = QueryTools.Transpose<TModel, TEntity>(query, Mappings);
 
             return results;
         }
@@ -97,11 +97,11 @@ namespace FluentApiNet.Core
             // define entry parameter
             var entryParameter = Expression.Parameter(typeof(TEntity), "x");
             // initialize the translator
-            var translator = new TranslationVisitor<Func<TEntity, bool>>(SelectMapping, entryParameter);
+            var translator = new TranslationVisitor<Func<TEntity, bool>>(Mappings, entryParameter);
             // translate filters in where expression
             var where = translator.Visit(filters) as LambdaExpression;
             // translate and generate order by expression
-            var orderBy = translator.Visit(SelectMapping.First().EntityMember) as MemberExpression;
+            var orderBy = translator.Visit(Mappings.First().EntityMember) as MemberExpression;
             // get basic query of the repository
             var query = GetQuery();
             // apply the where expression to the query

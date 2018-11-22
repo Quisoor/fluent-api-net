@@ -14,11 +14,6 @@ namespace FluentApiNet.Core
         where TContext : DbContext
     {
         /// <summary>
-        /// The entry parameter
-        /// </summary>
-        private readonly ParameterExpression entryParameter;
-
-        /// <summary>
         /// The translator
         /// </summary>
         private readonly TranslationVisitor<Func<TEntity, bool>> translator;
@@ -37,10 +32,8 @@ namespace FluentApiNet.Core
         public ServiceBase()
         {
             mappings = new List<Mapping>();
-            // define entry parameter
-            entryParameter = Expression.Parameter(typeof(TEntity), "x");
             // initialize the translator
-            translator = new TranslationVisitor<Func<TEntity, bool>>(entryParameter);
+            translator = new TranslationVisitor<Func<TEntity, bool>>();
         }
 
         /// <summary>
@@ -161,7 +154,7 @@ namespace FluentApiNet.Core
         private IQueryable<TEntity> ApplyWhere(IQueryable<TEntity> query, Expression<Func<TModel, bool>> filters)
         {
             var where = translator.Visit(filters) as LambdaExpression;
-            query = query.Where(Expression.Lambda<Func<TEntity, bool>>(where.Body, entryParameter));
+            query = query.Where(Expression.Lambda<Func<TEntity, bool>>(where.Body, translator.EntryParameter));
             return query;
         }
 
@@ -186,7 +179,7 @@ namespace FluentApiNet.Core
             // apply expressions
             if (orderBy != null)
             {
-                var lambda = (dynamic)Expression.Lambda(orderBy, entryParameter);
+                var lambda = (dynamic)Expression.Lambda(orderBy, translator.EntryParameter);
                 query = Queryable.OrderBy(query, lambda);
             }
 
@@ -212,7 +205,7 @@ namespace FluentApiNet.Core
             // initialize the model
             var init = Expression.MemberInit(ctor, assignments.ToArray());
             // create select expression
-            var select = Expression.Lambda<Func<TEntity, TModel>>(init, entryParameter);
+            var select = Expression.Lambda<Func<TEntity, TModel>>(init, translator.EntryParameter);
             // apply select expression
             return query.Select(select).ToList();
         }

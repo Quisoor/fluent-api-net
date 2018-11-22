@@ -14,11 +14,33 @@ namespace FluentApiNet.Core
         where TContext : DbContext
     {
         /// <summary>
+        /// The entry parameter
+        /// </summary>
+        private readonly ParameterExpression entryParameter;
+
+        /// <summary>
+        /// The translator
+        /// </summary>
+        private readonly TranslationVisitor<Func<TEntity, bool>> translator;
+
+        /// <summary>
+        /// Gets or sets mapping.
+        /// </summary>
+        /// <value>
+        /// The select mapping.
+        /// </value>
+        private readonly List<Mapping> mappings;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase{TModel, TEntity, TContext}"/> class.
         /// </summary>
         public ServiceBase()
         {
-            Mappings = new List<Mapping>();
+            mappings = new List<Mapping>();
+            // define entry parameter
+            entryParameter = Expression.Parameter(typeof(TEntity), "x");
+            // initialize the translator
+            translator = new TranslationVisitor<Func<TEntity, bool>>(entryParameter);
         }
 
         /// <summary>
@@ -30,12 +52,22 @@ namespace FluentApiNet.Core
         protected TContext Context { get; set; }
 
         /// <summary>
-        /// Gets or sets mapping.
+        /// Gets or sets the order by.
         /// </summary>
         /// <value>
-        /// The select mapping.
+        /// The order by.
         /// </value>
-        protected List<Mapping> Mappings { get; private set; }
+        protected MemberExpression OrderBy { get; set; }
+
+        /// <summary>
+        /// Adds the mapping.
+        /// </summary>
+        /// <param name="mapping">The mapping.</param>
+        protected void AddMapping(Mapping mapping)
+        {
+            this.mappings.Add(mapping);
+            this.translator.AddMapping(mapping);
+        }
 
         /// <summary>
         /// Gets the specified filters.
@@ -82,7 +114,7 @@ namespace FluentApiNet.Core
             query = query.Pagine(page.Value, pageSize.Value);
 
             // get the results
-            results.Result = QueryTools.Transpose<TModel, TEntity>(query, Mappings);
+            results.Result = ApplySelect(query);
 
             return results;
         }
@@ -94,20 +126,12 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         protected IQueryable<TEntity> GetQuery(Expression<Func<TModel, bool>> filters)
         {
-            // define entry parameter
-            var entryParameter = Expression.Parameter(typeof(TEntity), "x");
-            // initialize the translator
-            var translator = new TranslationVisitor<Func<TEntity, bool>>(Mappings, entryParameter);
-            // translate filters in where expression
-            var where = translator.Visit(filters) as LambdaExpression;
-            // translate and generate order by expression
-            var orderBy = translator.Visit(Mappings.First().EntityMember) as MemberExpression;
             // get basic query of the repository
             var query = GetQuery();
             // apply the where expression to the query
-            query = query.Where(Expression.Lambda<Func<TEntity,bool>>(where.Body, entryParameter));
+            query = ApplyWhere(query, filters);
             // apply order by expression to the query
-            query = query.OrderBy(Expression.Lambda<Func<TEntity, Int32>>(orderBy, entryParameter));
+            query = ApplyOrderBy(query);
             return query;
         }
 
@@ -126,6 +150,71 @@ namespace FluentApiNet.Core
             // get value of the repository
             var repository = (DbSet<TEntity>)repositoryProperty.GetValue(Context);
             return repository;
+        }
+
+        /// <summary>
+        /// Applies the where.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="filters">The filters.</param>
+        /// <returns>Query filtered</returns>
+        private IQueryable<TEntity> ApplyWhere(IQueryable<TEntity> query, Expression<Func<TModel, bool>> filters)
+        {
+            var where = translator.Visit(filters) as LambdaExpression;
+            query = query.Where(Expression.Lambda<Func<TEntity, bool>>(where.Body, entryParameter));
+            return query;
+        }
+
+        /// <summary>
+        /// Applies the order by.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>Query ordered</returns>
+        private IQueryable<TEntity> ApplyOrderBy(IQueryable<TEntity> query)
+        {
+            // get the order by expression
+            MemberExpression orderBy = null;
+            if (OrderBy == null && mappings.Count >= 1)
+            {
+                orderBy = translator.Visit(mappings.First().ModelMember) as MemberExpression;
+            }
+            else if (OrderBy != null)
+            {
+                orderBy = translator.Visit(OrderBy) as MemberExpression;
+            }
+
+            // apply expressions
+            if (orderBy != null)
+            {
+                var lambda = (dynamic)Expression.Lambda(orderBy, entryParameter);
+                query = Queryable.OrderBy(query, lambda);
+            }
+
+            return query;
+        }
+
+        /// <summary>
+        /// Applies the select.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>List of results</returns>
+        private List<TModel> ApplySelect(IQueryable<TEntity> query)
+        {
+            // new TModel()
+            var ctor = Expression.New(typeof(TModel));
+            var assignments = new List<MemberAssignment>();
+            foreach (var map in mappings)
+            {
+                // add assignment for the model property
+                var property = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
+                assignments.Add(Expression.Bind(property, translator.Visit(map.ModelMember)));
+            }
+            // initialize the model
+            var init = Expression.MemberInit(ctor, assignments.ToArray());
+            // create select expression
+            var select = Expression.Lambda<Func<TEntity, TModel>>(init, entryParameter);
+            // apply select expression
+            return query.Select(select).ToList();
         }
     }
 }

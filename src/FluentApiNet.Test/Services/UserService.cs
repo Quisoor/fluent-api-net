@@ -21,8 +21,8 @@ namespace FluentApiNet.Test.Services
             this.Context = context;
 
             // mapping
-            Mappings.Add(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity));
-            Mappings.Add(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.NameEntity));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.NameEntity));
         }
     }
 }

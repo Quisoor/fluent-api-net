@@ -13,19 +13,14 @@ namespace FluentApiNet.Abstract
     public class TranslationVisitor<TEntry> : ExpressionVisitor
     {
         /// <summary>
-        /// The mappings
-        /// </summary>
-        private readonly List<Mapping> mappings;
-
-        /// <summary>
         /// The entity type
         /// </summary>
-        private readonly Type entityType;
+        private Type entityType;
 
         /// <summary>
         /// The model type
         /// </summary>
-        private readonly Type modelType;
+        private Type modelType;
 
         /// <summary>
         /// The model to entity
@@ -38,11 +33,16 @@ namespace FluentApiNet.Abstract
         private readonly ParameterExpression entryParameter;
 
         /// <summary>
+        /// The mappings
+        /// </summary>
+        private readonly List<Mapping> mappings;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TranslationVisitor{TEntry}"/> class.
         /// </summary>
         /// <param name="mappings">The mappings.</param>
         /// <param name="entryParameter">The entry parameter.</param>
-        public TranslationVisitor(List<Mapping> mappings, ParameterExpression entryParameter) : this(mappings, entryParameter, true) { }
+        public TranslationVisitor(ParameterExpression entryParameter) : this(entryParameter, true) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TranslationVisitor{TEntry}"/> class.
@@ -50,16 +50,25 @@ namespace FluentApiNet.Abstract
         /// <param name="mappings">The mappings.</param>
         /// <param name="entryParameter">The entry parameter.</param>
         /// <param name="modelToEntity">if set to <c>true</c> [model to entity].</param>
-        public TranslationVisitor(List<Mapping> mappings, ParameterExpression entryParameter, bool modelToEntity)
+        public TranslationVisitor(ParameterExpression entryParameter, bool modelToEntity)
         {
-            this.mappings = mappings;
+            this.mappings = new List<Mapping>();
             this.modelToEntity = modelToEntity;
             this.entryParameter = entryParameter;
-            if (mappings.Any())
+        }
+
+        /// <summary>
+        /// Adds the mapping.
+        /// </summary>
+        /// <param name="mapping">The mapping.</param>
+        public void AddMapping(Mapping mapping)
+        {
+            if (!mappings.Any())
             {
-                entityType = mappings.First().EntityMember.Member.DeclaringType;
-                modelType = mappings.First().ModelMember.Member.DeclaringType;
+                modelType = mapping.ModelMember.Member.DeclaringType;
+                entityType = mapping.EntityMember.Member.DeclaringType;
             }
+            mappings.Add(mapping);
         }
 
         /// <summary>

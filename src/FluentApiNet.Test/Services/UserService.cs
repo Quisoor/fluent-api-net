@@ -3,6 +3,7 @@ using FluentApiNet.Core;
 using FluentApiNet.Test.Database;
 using FluentApiNet.Test.Entities;
 using FluentApiNet.Test.Models;
+using System.Linq;
 
 namespace FluentApiNet.Test.Services
 {
@@ -21,8 +22,15 @@ namespace FluentApiNet.Test.Services
             this.Context = context;
 
             // mapping
-            Mappings.Add(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity));
-            Mappings.Add(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.NameEntity));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.NameEntity));
+        }
+
+        public void Update(UserModel model)
+        {
+            var entity = GetQuery(x => x.IdModel == model.IdModel).Single();
+            entity.NameEntity = model.NameModel;
+            Context.SaveChanges();
         }
     }
 }

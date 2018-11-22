@@ -13,19 +13,19 @@ namespace FluentApiNet.Abstract
     public class TranslationVisitor<TEntry> : ExpressionVisitor
     {
         /// <summary>
-        /// The mappings
+        /// The default parameter name
         /// </summary>
-        private readonly List<Mapping> mappings;
+        public const string DEFAULT_PARAMETER_NAME = "traduct";
 
         /// <summary>
         /// The entity type
         /// </summary>
-        private readonly Type entityType;
+        private Type entityType;
 
         /// <summary>
         /// The model type
         /// </summary>
-        private readonly Type modelType;
+        private Type modelType;
 
         /// <summary>
         /// The model to entity
@@ -33,16 +33,16 @@ namespace FluentApiNet.Abstract
         private readonly bool modelToEntity;
 
         /// <summary>
-        /// The entry parameter
+        /// The mappings
         /// </summary>
-        private readonly ParameterExpression entryParameter;
+        private readonly List<Mapping> mappings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TranslationVisitor{TEntry}"/> class.
         /// </summary>
         /// <param name="mappings">The mappings.</param>
         /// <param name="entryParameter">The entry parameter.</param>
-        public TranslationVisitor(List<Mapping> mappings, ParameterExpression entryParameter) : this(mappings, entryParameter, true) { }
+        public TranslationVisitor() : this(true) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TranslationVisitor{TEntry}"/> class.
@@ -50,16 +50,26 @@ namespace FluentApiNet.Abstract
         /// <param name="mappings">The mappings.</param>
         /// <param name="entryParameter">The entry parameter.</param>
         /// <param name="modelToEntity">if set to <c>true</c> [model to entity].</param>
-        public TranslationVisitor(List<Mapping> mappings, ParameterExpression entryParameter, bool modelToEntity)
+        public TranslationVisitor(bool modelToEntity)
         {
-            this.mappings = mappings;
+            this.mappings = new List<Mapping>();
             this.modelToEntity = modelToEntity;
-            this.entryParameter = entryParameter;
-            if (mappings.Any())
+        }
+
+        public ParameterExpression EntryParameter { get; set; }
+
+        /// <summary>
+        /// Adds the mapping.
+        /// </summary>
+        /// <param name="mapping">The mapping.</param>
+        public void AddMapping(Mapping mapping)
+        {
+            if (!mappings.Any())
             {
-                entityType = mappings.First().EntityMember.Member.DeclaringType;
-                modelType = mappings.First().ModelMember.Member.DeclaringType;
+                modelType = mapping.ModelMember.Member.DeclaringType;
+                entityType = mapping.EntityMember.Member.DeclaringType;
             }
+            mappings.Add(mapping);
         }
 
         /// <summary>
@@ -84,11 +94,11 @@ namespace FluentApiNet.Abstract
         /// The modified expression, if it or any subexpression was modified; otherwise, returns the original expression.
         /// </returns>
         protected override Expression VisitLambda<T>(Expression<T> node)
-        {            
+        {
             if (node.Parameters.Count == 1)
             {
                 var parameter = node.Parameters.Single();
-                var param = this.Visit(parameter) as ParameterExpression;
+                var param = TranslateParameter(parameter);
 
                 if (param != null)
                 {
@@ -109,7 +119,29 @@ namespace FluentApiNet.Abstract
         /// </returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            return entryParameter;
+            if (node.Name == EntryParameter.Name)
+            {
+                return EntryParameter;
+            }
+            return base.VisitParameter(node);
+        }
+
+        /// <summary>
+        /// Translates the parameter.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        /// <returns></returns>
+        protected ParameterExpression TranslateParameter(ParameterExpression node)
+        {
+            if (node.Type == entityType)
+            {
+                EntryParameter = Expression.Parameter(modelType, node.Name);
+            }
+            if (node.Type == modelType)
+            {
+                EntryParameter = Expression.Parameter(entityType, node.Name);
+            }
+            return EntryParameter;
         }
 
         /// <summary>
@@ -121,14 +153,17 @@ namespace FluentApiNet.Abstract
         /// </returns>
         protected override Expression VisitMember(MemberExpression node)
         {
-            var param = this.Visit(node.Expression) as ParameterExpression;
-            if (node.Member.DeclaringType == entityType && !modelToEntity)
+            if ((node.Expression as ParameterExpression)?.Name == EntryParameter.Name)
             {
-                return Expression.MakeMemberAccess(param, mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember.Member);
-            }
-            if (node.Member.DeclaringType == modelType && modelToEntity)
-            {
-                return Expression.MakeMemberAccess(param, mappings.Single(x => x.ModelMember.Member.Name == node.Member.Name).EntityMember.Member);
+                var param = this.Visit(node.Expression) as ParameterExpression;
+                if (node.Member.DeclaringType == entityType && !modelToEntity)
+                {
+                    return Expression.MakeMemberAccess(param, mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember.Member);
+                }
+                if (node.Member.DeclaringType == modelType && modelToEntity)
+                {
+                    return Expression.MakeMemberAccess(param, mappings.Single(x => x.ModelMember.Member.Name == node.Member.Name).EntityMember.Member);
+                }
             }
             return base.VisitMember(node);
         }

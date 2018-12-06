@@ -197,6 +197,59 @@ namespace FluentApiNet.Core
         }
 
         /// <summary>
+        /// Updates the specified model.
+        /// </summary>
+        /// <param name="model">The model.</param>
+        /// <returns>Updated model</returns>
+        public Results<TModel> Update(TModel model)
+        {
+            // construct where expression with key properties
+            ParameterExpression parameter = Expression.Parameter(typeof(TEntity), "x");
+            var keyMappings = mappings.Where(x => x.IsPrimaryKey).ToList();
+            Expression expression = Expression.Constant(true);
+            foreach(var keyMapping in keyMappings)
+            {
+                var left = Expression.MakeMemberAccess(parameter, keyMapping.EntityMember.Member);
+                var keyProperty = typeof(TModel).GetProperty(keyMapping.ModelMember.Member.Name);
+                var right = Expression.Constant(keyProperty.GetValue(model));
+                var equal = Expression.Equal(left, right);
+                expression = Expression.AndAlso(expression, equal);
+            }
+
+            // search entity
+            var entity = Repository.Single(Expression.Lambda<Func<TEntity, bool>>(expression, parameter));
+
+            // update entity
+            entity = Map(ref entity, model);
+            Context.SaveChanges();
+
+            // format results
+            var results = new Results<TModel>();
+            results.Count = 1;
+            results.Result.Add(model);
+
+            // return results
+            return results;
+        }
+
+        /// <summary>
+        /// Updates the specified models.
+        /// </summary>
+        /// <param name="models">The models.</param>
+        /// <returns>Updated models</returns>
+        public Results<TModel> Update(IEnumerable<TModel> models)
+        {
+            var results = new Results<TModel>();
+            foreach(var model in models)
+            {
+                var result = Update(model);
+                results.Count = results.Count + result.Count;
+                results.Result.AddRange(result.Result);
+            }
+            return results;
+        }
+
+        /// <summary>
         /// Deletes the specified filters.
         /// </summary>
         /// <param name="filters">The filters.</param>

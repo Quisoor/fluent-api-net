@@ -22,15 +22,8 @@ namespace FluentApiNet.Test.Services
             this.Context = context;
 
             // mapping
-            AddMapping(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity, true));
             AddMapping(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.NameEntity));
-        }
-
-        public void Update(UserModel model)
-        {
-            var entity = GetQuery(x => x.IdModel == model.IdModel).Single();
-            entity.NameEntity = model.NameModel;
-            Context.SaveChanges();
         }
     }
 }

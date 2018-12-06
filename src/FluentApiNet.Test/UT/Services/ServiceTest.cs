@@ -76,5 +76,24 @@ namespace FluentApiNet.Test.UT.Services
                 Assert.AreEqual(expected.NameEntity, created.NameEntity);
             }
         }
+
+        [TestMethod]
+        public void ServiceTest_Delete()
+        {
+            var connection = Effort.DbConnectionFactory.CreateTransient();
+            var context = new TestDbContext(connection);
+            var entities = new List<User>
+            {
+                new User { IdEntity = 1, NameEntity = "Created1" },
+                new User { IdEntity = 2, NameEntity = "Created2" }
+            };
+            context.Users.AddRange(entities);
+            context.SaveChanges();
+            var service = new UserService(context);
+            service.Delete(x => x.IdModel == 1 || x.IdModel == 2);
+            var actuals = context.Users.ToList();
+            var expected = new List<User>();
+            Assert.AreEqual(expected.Count, actuals.Count);
+        }
     }
 }

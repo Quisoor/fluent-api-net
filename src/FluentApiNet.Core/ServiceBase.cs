@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using Z.EntityFramework.Plus;
 
 namespace FluentApiNet.Core
 {
@@ -193,6 +194,14 @@ namespace FluentApiNet.Core
 
             // return results
             return results;
+        }
+                
+        public bool Delete(Expression<Func<TModel, bool>> filters)
+        {
+            var query = GetQuery(filters);
+            var result = query.Delete();
+            Context.SaveChanges();
+            return result > 0;
         }
 
         /// <summary>

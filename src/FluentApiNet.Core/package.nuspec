@@ -1,10 +1,10 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <package>
   <metadata>
     <!--*-->
     <id>FluentApiNet.Core</id>
     <!--*-->
-    <version>0.0.1-alpha001</version>
+    <version>1.0.0-beta01</version>
     <title>FluentApiNet.Core</title>
     <!--*-->
     <authors>Aurélien Bretin</authors>
@@ -18,11 +18,13 @@
     <!--*-->
     <description>FluentApiNet.Core</description>
     <!--*-->
-    <releaseNotes> </releaseNotes>
+    <releaseNotes>Basical fonctionalities with Get, Create, Update, Delete</releaseNotes>
     <copyright>Copyright 2018 © Aurélien Bretin</copyright>
-    <tags> </tags>
+    <tags>
+    </tags>
     <dependencies>
       <dependency id="EntityFramework" version="6.2.0" />
+      <dependency id="Z.EntityFramework.Plus.EF6" version="1.8.16" />
     </dependencies>
   </metadata>
   <files>

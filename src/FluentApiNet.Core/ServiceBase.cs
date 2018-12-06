@@ -195,7 +195,12 @@ namespace FluentApiNet.Core
             // return results
             return results;
         }
-                
+
+        /// <summary>
+        /// Deletes the specified filters.
+        /// </summary>
+        /// <param name="filters">The filters.</param>
+        /// <returns>If is deleted</returns>
         public bool Delete(Expression<Func<TModel, bool>> filters)
         {
             var query = GetQuery(filters);

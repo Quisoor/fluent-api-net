@@ -45,6 +45,28 @@ namespace FluentApiNet.Core
         protected TContext Context { get; set; }
 
         /// <summary>
+        /// Gets the repository.
+        /// </summary>
+        /// <value>
+        /// The repository.
+        /// </value>
+        protected DbSet<TEntity> Repository
+        {
+            get
+            {
+                // get repository property in the context
+                var repositoryProperty = typeof(TContext).GetProperties()
+                    .Single(p => p.PropertyType.IsGenericType
+                        && p.PropertyType.Name.StartsWith("DbSet")
+                        && p.PropertyType.GetGenericArguments().Length > 0
+                        && p.PropertyType.GetGenericArguments().First() == typeof(TEntity));
+                // get value of the repository
+                var repository = (DbSet<TEntity>)repositoryProperty.GetValue(Context);
+                return repository;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the order by.
         /// </summary>
         /// <value>
@@ -113,6 +135,58 @@ namespace FluentApiNet.Core
         }
 
         /// <summary>
+        /// Creates the specified model.
+        /// </summary>
+        /// <param name="model">The model.</param>
+        /// <returns>Created model</returns>
+        public Results<TModel> Create(TModel model)
+        {
+            // map the entity
+            var entity = new TEntity();
+            entity = Map(ref entity, model);
+
+            // add entity to database
+            Repository.Add(entity);
+            Context.SaveChanges();
+
+            // format the result
+            var results = new Results<TModel>();
+            results.Count = 1;
+            results.Result.Add(Map(ref model, entity));
+
+            // return the result
+            return results;
+        }
+
+        /// <summary>
+        /// Creates the specified models.
+        /// </summary>
+        /// <param name="models">The models.</param>
+        /// <returns>Created models</returns>
+        public Results<TModel> Create(IEnumerable<TModel> models)
+        {
+            // map entities
+            var entities = new List<TEntity>();
+            foreach(var model in models)
+            {
+                var entity = new TEntity();
+                entity = Map(ref entity, model);
+                entities.Add(entity);
+            }
+            // add entities to database
+            Repository.AddRange(entities);
+            Context.SaveChanges();
+
+            // format results
+            var results = new Results<TModel>();
+            results.Count = models.Count();
+            results.Result = ApplySelect(entities.AsQueryable());
+
+            // return results
+            return results;
+        }
+
+        /// <summary>
         /// Gets the query.
         /// </summary>
         /// <param name="filters">The filters.</param>
@@ -134,14 +208,7 @@ namespace FluentApiNet.Core
         /// <returns>The repository</returns>
         private IQueryable<TEntity> GetQuery()
         {
-            // get repository property in the context
-            var repositoryProperty = typeof(TContext).GetProperties()
-                .Single(p => p.PropertyType.IsGenericType
-                    && p.PropertyType.Name.StartsWith("DbSet")
-                    && p.PropertyType.GetGenericArguments().Length > 0
-                    && p.PropertyType.GetGenericArguments().First() == typeof(TEntity));
-            // get value of the repository
-            var repository = (DbSet<TEntity>)repositoryProperty.GetValue(Context);
+            var repository = Repository;
             return repository;
         }
 
@@ -208,6 +275,40 @@ namespace FluentApiNet.Core
             var select = Expression.Lambda<Func<TEntity, TModel>>(init, translator.EntryParameter);
             // apply select expression
             return query.Select(select).ToList();
+        }
+
+        /// <summary>
+        /// Maps the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="model">The model.</param>
+        /// <returns>Mapped entity</returns>
+        private TEntity Map(ref TEntity entity, TModel model)
+        {
+            foreach (var map in mappings)
+            {
+                var entityProperty = typeof(TEntity).GetProperty(map.EntityMember.Member.Name);
+                var modelProperty = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
+                entityProperty.SetValue(entity, modelProperty.GetValue(model));
+            }
+            return entity;
+        }
+
+        /// <summary>
+        /// Maps the specified model.
+        /// </summary>
+        /// <param name="model">The model.</param>
+        /// <param name="entity">The entity.</param>
+        /// <returns>Mapped model</returns>
+        private TModel Map(ref TModel model, TEntity entity)
+        {
+            foreach (var map in mappings)
+            {
+                var entityProperty = typeof(TEntity).GetProperty(map.EntityMember.Member.Name);
+                var modelProperty = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
+                modelProperty.SetValue(model, entityProperty.GetValue(entity));
+            }
+            return model;
         }
     }
 }

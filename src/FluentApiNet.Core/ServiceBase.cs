@@ -80,8 +80,8 @@ namespace FluentApiNet.Core
         /// <param name="mapping">The mapping.</param>
         protected void AddMapping(Mapping mapping)
         {
-            this.mappings.Add(mapping);
-            this.translator.AddMapping(mapping);
+            mappings.Add(mapping);
+            translator.AddMapping(mapping);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         public Results<TModel> Get(Expression<Func<TModel, bool>> filters)
         {
-            return this.Get(filters, PaginationTools.DEFAULT_PAGE, PaginationTools.DEFAULT_PAGESIZE);
+            return Get(filters, PaginationTools.DEFAULT_PAGE, PaginationTools.DEFAULT_PAGESIZE);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         public Results<TModel> Get(Expression<Func<TModel, bool>> filters, int? page)
         {
-            return this.Get(filters, page, PaginationTools.DEFAULT_PAGESIZE);
+            return Get(filters, page, PaginationTools.DEFAULT_PAGESIZE);
         }
 
         /// <summary>
@@ -150,8 +150,10 @@ namespace FluentApiNet.Core
             Context.SaveChanges();
 
             // format the result
-            var results = new Results<TModel>();
-            results.Count = 1;
+            var results = new Results<TModel>
+            {
+                Count = 1
+            };
             results.Result.Add(Map(ref model, entity));
 
             // return the result
@@ -167,7 +169,7 @@ namespace FluentApiNet.Core
         {
             // map entities
             var entities = new List<TEntity>();
-            foreach(var model in models)
+            foreach (var model in models)
             {
                 var entity = new TEntity();
                 entity = Map(ref entity, model);
@@ -178,9 +180,16 @@ namespace FluentApiNet.Core
             Context.SaveChanges();
 
             // format results
-            var results = new Results<TModel>();
-            results.Count = models.Count();
-            results.Result = ApplySelect(entities.AsQueryable());
+            var results = new Results<TModel>
+            {
+                Count = models.Count(),
+                Result = entities.Select(x =>
+                {
+                    var model = new TModel();
+                    return Map(ref model, x);
+                })
+                .ToList()
+            };
 
             // return results
             return results;

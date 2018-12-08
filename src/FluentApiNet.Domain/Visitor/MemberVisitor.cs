@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace FluentApiNet.Abstract
+namespace FluentApiNet.Domain.Visitor
 {
     /// <summary>
     /// Member visitor class

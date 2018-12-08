@@ -37,6 +37,12 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="FluentApiNet.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentApiNet.Domain.1.0.0-beta01\lib\net461\FluentApiNet.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentApiNet.Tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentApiNet.Tools.1.0.0-beta01\lib\net461\FluentApiNet.Tools.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -46,8 +52,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.8.16.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z.EntityFramework.Plus.EF6.1.8.16\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
+    <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.8.19.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.EntityFramework.Plus.EF6.1.8.19\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -57,20 +63,6 @@
   <ItemGroup>
     <None Include="package.nuspec" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FluentApiNet.Abstract\FluentApiNet.Abstract.csproj">
-      <Project>{0774b5f3-a439-4807-b533-8d748b6770f5}</Project>
-      <Name>FluentApiNet.Abstract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FluentApiNet.EF\FluentApiNet.EF.csproj">
-      <Project>{36e18c13-b037-4288-b4da-016fe410f8be}</Project>
-      <Name>FluentApiNet.EF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FluentApiNet.Tools\FluentApiNet.Tools.csproj">
-      <Project>{1a330564-0412-443f-bfd6-a7ced762d92e}</Project>
-      <Name>FluentApiNet.Tools</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

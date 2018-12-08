@@ -1,7 +1,8 @@
-﻿using System;
+﻿using FluentApiNet.Domain.Visitor;
+using System;
 using System.Linq.Expressions;
 
-namespace FluentApiNet.Abstract
+namespace FluentApiNet.Domain
 {
     /// <summary>
     /// Mapping class

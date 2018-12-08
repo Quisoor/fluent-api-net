@@ -1,9 +1,8 @@
-﻿using FluentApiNet.Abstract;
-using FluentApiNet.Core;
+﻿using FluentApiNet.Core;
+using FluentApiNet.Domain;
 using FluentApiNet.Test.Database;
 using FluentApiNet.Test.Entities;
 using FluentApiNet.Test.Models;
-using System.Linq;
 
 namespace FluentApiNet.Test.Services
 {
@@ -19,7 +18,7 @@ namespace FluentApiNet.Test.Services
         /// <param name="context">The context.</param>
         public UserService(TestDbContext context)
         {
-            this.Context = context;
+            Context = context;
 
             // mapping
             AddMapping(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity, true));

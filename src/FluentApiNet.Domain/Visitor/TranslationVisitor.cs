@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace FluentApiNet.Abstract
+namespace FluentApiNet.Domain.Visitor
 {
     /// <summary>
     /// Translation visitor class

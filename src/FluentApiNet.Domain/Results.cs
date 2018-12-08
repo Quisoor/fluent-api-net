@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FluentApiNet.Abstract
+namespace FluentApiNet.Domain
 {
     /// <summary>
     /// Results class

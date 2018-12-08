@@ -1,4 +1,5 @@
-﻿using FluentApiNet.Abstract;
+﻿using FluentApiNet.Domain;
+using FluentApiNet.Domain.Visitor;
 using FluentApiNet.Tools;
 using System;
 using System.Collections.Generic;
@@ -207,7 +208,7 @@ namespace FluentApiNet.Core
             ParameterExpression parameter = Expression.Parameter(typeof(TEntity), "x");
             var keyMappings = mappings.Where(x => x.IsPrimaryKey).ToList();
             Expression expression = Expression.Constant(true);
-            foreach(var keyMapping in keyMappings)
+            foreach (var keyMapping in keyMappings)
             {
                 var left = Expression.MakeMemberAccess(parameter, keyMapping.EntityMember.Member);
                 var keyProperty = typeof(TModel).GetProperty(keyMapping.ModelMember.Member.Name);
@@ -224,8 +225,10 @@ namespace FluentApiNet.Core
             Context.SaveChanges();
 
             // format results
-            var results = new Results<TModel>();
-            results.Count = 1;
+            var results = new Results<TModel>
+            {
+                Count = 1
+            };
             results.Result.Add(model);
 
             // return results
@@ -240,7 +243,7 @@ namespace FluentApiNet.Core
         public Results<TModel> Update(IEnumerable<TModel> models)
         {
             var results = new Results<TModel>();
-            foreach(var model in models)
+            foreach (var model in models)
             {
                 var result = Update(model);
                 results.Count = results.Count + result.Count;

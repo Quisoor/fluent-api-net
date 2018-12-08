@@ -46,10 +46,7 @@
     <Compile Include="QueryTools.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluentApiNet.Abstract\FluentApiNet.Abstract.csproj">
-      <Project>{0774B5F3-A439-4807-B533-8D748B6770F5}</Project>
-      <Name>FluentApiNet.Abstract</Name>
-    </ProjectReference>
+    <None Include="package.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

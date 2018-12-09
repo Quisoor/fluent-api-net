@@ -23,8 +23,8 @@
     <tags>
     </tags>
     <dependencies>
-      <dependency id="FluentApiNet.Domain" version="1.0.0-beta01" />
-      <dependency id="FluentApiNet.Tools" version="1.0.0-beta01" />
+      <dependency id="FluentApiNet.Domain" version="1.0.0" />
+      <dependency id="FluentApiNet.Tools" version="1.0.0" />
       <dependency id="EntityFramework" version="6.2.0" />
       <dependency id="Z.EntityFramework.Plus.EF6" version="1.8.19" />
     </dependencies>

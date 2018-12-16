@@ -23,6 +23,7 @@ namespace FluentApiNet.Test.Services
             // mapping
             AddMapping(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity, true));
             AddMapping(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.NameEntity));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.RoleModel, x => x.RoleEntity.NameEntity));
         }
     }
 }

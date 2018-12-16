@@ -20,5 +20,13 @@
         /// The name model.
         /// </value>
         public string NameModel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the role model.
+        /// </summary>
+        /// <value>
+        /// The role model.
+        /// </value>
+        public string RoleModel { get; set; }
     }
 }

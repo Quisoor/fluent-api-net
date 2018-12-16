@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Z.EntityFramework.Plus;
 
 namespace FluentApiNet.Core
@@ -366,11 +367,45 @@ namespace FluentApiNet.Core
         {
             foreach (var map in mappings)
             {
-                var entityProperty = typeof(TEntity).GetProperty(map.EntityMember.Member.Name);
                 var modelProperty = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
-                entityProperty.SetValue(entity, modelProperty.GetValue(model));
+                var modelValue = modelProperty.GetValue(model);
+                if (modelValue != null)
+                {
+                    string entityPropertyName = map.EntityMember.Member.Name;
+                    Expression entityExpression = map.EntityMember.Expression as Expression;
+                    while (entityExpression is MemberExpression)
+                    {
+                        var expression = entityExpression as MemberExpression;
+                        entityPropertyName = string.Concat(expression.Member.Name, ".", entityPropertyName);
+                        entityExpression = expression.Expression;
+                    }
+                    SetProperty(entityPropertyName, entity, modelValue);
+                }
             }
             return entity;
+        }
+
+        /// <summary>
+        /// Sets the property.
+        /// </summary>
+        /// <param name="compoundProperty">The compound property.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="value">The value.</param>
+        public void SetProperty(string compoundProperty, object target, object value)
+        {
+            string[] bits = compoundProperty.Split('.');
+            for (int i = 0; i < bits.Length - 1; i++)
+            {
+                PropertyInfo propertyToGet = target.GetType().GetProperty(bits[i]);
+                if(propertyToGet.GetValue(target) == null && propertyToGet.PropertyType.IsClass)
+                {
+                    var propertyGetValue = Activator.CreateInstance(propertyToGet.PropertyType);
+                    propertyToGet.SetValue(target, propertyGetValue);
+                }
+                target = propertyToGet.GetValue(target, null);
+            }
+            PropertyInfo propertyToSet = target.GetType().GetProperty(bits.Last());
+            propertyToSet.SetValue(target, value, null);
         }
 
         /// <summary>

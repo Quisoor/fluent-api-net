@@ -16,7 +16,7 @@ namespace FluentApiNet.Test.UT.Services
         {
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDbContext(connection);
-            context.Users.Add(new Entities.User { IdEntity = 1, NameEntity = "Aurélien" });
+            context.Users.Add(new Entities.User { IdEntity = 1, NameEntity = "NAME1", RoleEntity = new Role { IdEntity = 1, NameEntity = "ROLE" } });
             context.SaveChanges();
             var service = new UserService(context);
             var result = service.Get(x => x.IdModel == 1);
@@ -28,14 +28,15 @@ namespace FluentApiNet.Test.UT.Services
         {
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDbContext(connection);
-            context.Users.Add(new User { IdEntity = 1, NameEntity = "Aurélien" });
+            context.Users.Add(new User { IdEntity = 1, NameEntity = "NAME1", RoleEntity = new Role { IdEntity = 1, NameEntity = "ROLE1" } });
             context.SaveChanges();
             var service = new UserService(context);
-            service.Update(new UserModel { IdModel = 1, NameModel = "Modified" });
+            service.Update(new UserModel { IdModel = 1, NameModel = "Modified", RoleModel = "ROLE2" });
             var updated = context.Users.Single(x => x.IdEntity == 1);
-            var expected = new User { IdEntity = 1, NameEntity = "Modified" };
+            var expected = new User { IdEntity = 1, NameEntity = "Modified", RoleEntity = new Role { NameEntity = "ROLE2" } };
             Assert.AreEqual(expected.IdEntity, updated.IdEntity);
             Assert.AreEqual(expected.NameEntity, updated.NameEntity);
+            Assert.AreEqual(expected.RoleEntity.NameEntity, updated.RoleEntity.NameEntity);
         }
 
         [TestMethod]
@@ -44,11 +45,13 @@ namespace FluentApiNet.Test.UT.Services
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDbContext(connection);
             var service = new UserService(context);
-            service.Create(new Models.UserModel { IdModel = 1, NameModel = "Created" });
+            service.Create(new Models.UserModel { IdModel = 1, NameModel = "Created", RoleModel = "ROLE" });
             var created = context.Users.Single(x => x.IdEntity == 1);
             var expected = new User { IdEntity = 1, NameEntity = "Created" };
+            var expectedRole = new Role { NameEntity = "ROLE" };
             Assert.AreEqual(expected.IdEntity, created.IdEntity);
             Assert.AreEqual(expected.NameEntity, created.NameEntity);
+            Assert.AreEqual(expectedRole.NameEntity, created.RoleEntity.NameEntity);
         }
 
         [TestMethod]
@@ -60,20 +63,28 @@ namespace FluentApiNet.Test.UT.Services
             var models = new List<UserModel>
             {
                 new UserModel { IdModel = 1, NameModel = "Created1" },
-                new UserModel { IdModel = 2, NameModel = "Created2" }
+                new UserModel { IdModel = 2, NameModel = "Created2", RoleModel = "ROLE1" }
             };
             service.Create(models);
             var createds = context.Users.ToList();
             var expecteds = new List<User>
             {
                 new User { IdEntity = 1, NameEntity = "Created1" },
-                new User { IdEntity = 2, NameEntity = "Created2" }
+                new User { IdEntity = 2, NameEntity = "Created2", RoleEntity = new Role{NameEntity = "ROLE1" } }
             };
             foreach (var created in createds)
             {
                 var expected = expecteds.Single(x => x.IdEntity == created.IdEntity);
                 Assert.AreEqual(expected.IdEntity, created.IdEntity);
                 Assert.AreEqual(expected.NameEntity, created.NameEntity);
+                if (expected.RoleEntity is null)
+                {
+                    Assert.IsNull(created.RoleEntity);
+                }
+                else
+                {
+                    Assert.AreEqual(expected.RoleEntity.NameEntity, created.RoleEntity.NameEntity);
+                }
             }
         }
 
@@ -84,8 +95,8 @@ namespace FluentApiNet.Test.UT.Services
             var context = new TestDbContext(connection);
             var entities = new List<User>
             {
-                new User { IdEntity = 1, NameEntity = "Created1" },
-                new User { IdEntity = 2, NameEntity = "Created2" }
+                new User { IdEntity = 1, NameEntity = "Created1", RoleEntity = new Role{IdEntity = 1, NameEntity = "ROLE1" }},
+                new User { IdEntity = 2, NameEntity = "Created2", RoleEntity = new Role{IdEntity = 2, NameEntity = "ROLE2" }}
             };
             context.Users.AddRange(entities);
             context.SaveChanges();

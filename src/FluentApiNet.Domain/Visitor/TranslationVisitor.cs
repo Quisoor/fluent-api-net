@@ -156,13 +156,26 @@ namespace FluentApiNet.Domain.Visitor
             if ((node.Expression as ParameterExpression)?.Name == EntryParameter.Name)
             {
                 var param = this.Visit(node.Expression) as ParameterExpression;
+                MemberExpression mapping = null;
                 if (node.Member.DeclaringType == entityType && !modelToEntity)
                 {
-                    return Expression.MakeMemberAccess(param, mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember.Member);
+                    mapping = mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember;                    
                 }
                 if (node.Member.DeclaringType == modelType && modelToEntity)
                 {
-                    return Expression.MakeMemberAccess(param, mappings.Single(x => x.ModelMember.Member.Name == node.Member.Name).EntityMember.Member);
+                    mapping = mappings.Single(x => x.ModelMember.Member.Name == node.Member.Name).EntityMember;
+                }
+                if (mapping != null)
+                {
+                    if (mapping.Expression is ParameterExpression)
+                    {
+                        return Expression.MakeMemberAccess(param, mapping.Member);
+                    }
+                    else
+                    {
+                        var left = Visit(mapping.Expression);
+                        return Expression.MakeMemberAccess(left, mapping.Member);
+                    }
                 }
             }
             return base.VisitMember(node);

@@ -391,7 +391,7 @@ namespace FluentApiNet.Core
         /// <param name="compoundProperty">The compound property.</param>
         /// <param name="target">The target.</param>
         /// <param name="value">The value.</param>
-        public void SetProperty(string compoundProperty, object target, object value)
+        private void SetProperty(string compoundProperty, object target, object value)
         {
             string[] bits = compoundProperty.Split('.');
             for (int i = 0; i < bits.Length - 1; i++)

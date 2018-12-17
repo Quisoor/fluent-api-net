@@ -222,7 +222,7 @@ namespace FluentApiNet.Core
             var entity = Repository.Single(Expression.Lambda<Func<TEntity, bool>>(expression, parameter));
 
             // update entity
-            entity = Map(ref entity, model);
+            Map(ref entity, model);
             Context.SaveChanges();
 
             // format results
@@ -372,7 +372,7 @@ namespace FluentApiNet.Core
                 if (modelValue != null)
                 {
                     string entityPropertyName = map.EntityMember.Member.Name;
-                    Expression entityExpression = map.EntityMember.Expression as Expression;
+                    var entityExpression = map.EntityMember.Expression as Expression;
                     while (entityExpression is MemberExpression)
                     {
                         var expression = entityExpression as MemberExpression;

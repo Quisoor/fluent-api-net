@@ -372,7 +372,7 @@ namespace FluentApiNet.Core
                 if (modelValue != null)
                 {
                     string entityPropertyName = map.EntityMember.Member.Name;
-                    var entityExpression = map.EntityMember.Expression as Expression;
+                    var entityExpression = map.EntityMember.Expression;
                     while (entityExpression is MemberExpression)
                     {
                         var expression = entityExpression as MemberExpression;

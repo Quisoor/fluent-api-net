@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentApiNet.Tools", "FluentApiNet.Tools\FluentApiNet.Tools.csproj", "{1A330564-0412-443F-BFD6-A7CED762D92E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentApiNet.Test", "FluentApiNet.Test\FluentApiNet.Test.csproj", "{F7555159-77CD-466E-A57D-279A1E1FD8AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentApiNet.Core", "FluentApiNet.Core\FluentApiNet.Core.csproj", "{CE85A20F-35A7-405E-9B06-87774D16F6FB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentApiNet.Domain", "FluentApiNet.Domain\FluentApiNet.Domain.csproj", "{1F97CF06-0E1C-49B0-B8EC-37AF4B9A5AB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentApiNet", "FluentApiNet\FluentApiNet.csproj", "{03C7BDE8-8BE3-4DB3-B791-3A824BA5C9CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,22 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1A330564-0412-443F-BFD6-A7CED762D92E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A330564-0412-443F-BFD6-A7CED762D92E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A330564-0412-443F-BFD6-A7CED762D92E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A330564-0412-443F-BFD6-A7CED762D92E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F7555159-77CD-466E-A57D-279A1E1FD8AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F7555159-77CD-466E-A57D-279A1E1FD8AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7555159-77CD-466E-A57D-279A1E1FD8AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7555159-77CD-466E-A57D-279A1E1FD8AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE85A20F-35A7-405E-9B06-87774D16F6FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE85A20F-35A7-405E-9B06-87774D16F6FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE85A20F-35A7-405E-9B06-87774D16F6FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE85A20F-35A7-405E-9B06-87774D16F6FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1F97CF06-0E1C-49B0-B8EC-37AF4B9A5AB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F97CF06-0E1C-49B0-B8EC-37AF4B9A5AB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F97CF06-0E1C-49B0-B8EC-37AF4B9A5AB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F97CF06-0E1C-49B0-B8EC-37AF4B9A5AB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03C7BDE8-8BE3-4DB3-B791-3A824BA5C9CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03C7BDE8-8BE3-4DB3-B791-3A824BA5C9CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03C7BDE8-8BE3-4DB3-B791-3A824BA5C9CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03C7BDE8-8BE3-4DB3-B791-3A824BA5C9CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

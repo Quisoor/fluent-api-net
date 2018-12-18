@@ -22,19 +22,11 @@ namespace FluentApiNet.Core
         private readonly TranslationVisitor<Func<TEntity, bool>> translator;
 
         /// <summary>
-        /// Gets or sets mapping.
-        /// </summary>
-        /// <value>
-        /// The select mapping.
-        /// </value>
-        private readonly List<Mapping> mappings;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase{TModel, TEntity, TContext}"/> class.
         /// </summary>
         public ServiceBase()
         {
-            mappings = new List<Mapping>();
+            Mappings = new List<Mapping>();
             // initialize the translator
             translator = new TranslationVisitor<Func<TEntity, bool>>();
         }
@@ -78,12 +70,20 @@ namespace FluentApiNet.Core
         protected MemberExpression OrderBy { get; set; }
 
         /// <summary>
+        /// Gets the mappings.
+        /// </summary>
+        /// <value>
+        /// The mappings.
+        /// </value>
+        public List<Mapping> Mappings { get; }
+
+        /// <summary>
         /// Adds the mapping.
         /// </summary>
         /// <param name="mapping">The mapping.</param>
         protected void AddMapping(Mapping mapping)
         {
-            mappings.Add(mapping);
+            Mappings.Add(mapping);
             translator.AddMapping(mapping);
         }
 
@@ -207,7 +207,7 @@ namespace FluentApiNet.Core
         {
             // construct where expression with key properties
             ParameterExpression parameter = Expression.Parameter(typeof(TEntity), "x");
-            var keyMappings = mappings.Where(x => x.IsPrimaryKey).ToList();
+            var keyMappings = Mappings.Where(x => x.IsPrimaryKey).ToList();
             Expression expression = Expression.Constant(true);
             foreach (var keyMapping in keyMappings)
             {
@@ -271,7 +271,7 @@ namespace FluentApiNet.Core
         /// </summary>
         /// <param name="filters">The filters.</param>
         /// <returns></returns>
-        protected IQueryable<TEntity> GetQuery(Expression<Func<TModel, bool>> filters)
+        public IQueryable<TEntity> GetQuery(Expression<Func<TModel, bool>> filters)
         {
             // get basic query of the repository
             var query = GetQuery();
@@ -286,7 +286,7 @@ namespace FluentApiNet.Core
         /// Gets the query.
         /// </summary>
         /// <returns>The repository</returns>
-        private IQueryable<TEntity> GetQuery()
+        public IQueryable<TEntity> GetQuery()
         {
             var repository = Repository;
             return repository;
@@ -314,9 +314,9 @@ namespace FluentApiNet.Core
         {
             // get the order by expression
             MemberExpression orderBy = null;
-            if (OrderBy == null && mappings.Count >= 1)
+            if (OrderBy == null && Mappings.Count >= 1)
             {
-                orderBy = translator.Visit(mappings.First().ModelMember) as MemberExpression;
+                orderBy = translator.Visit(Mappings.First().ModelMember) as MemberExpression;
             }
             else if (OrderBy != null)
             {
@@ -343,7 +343,7 @@ namespace FluentApiNet.Core
             // new TModel()
             var ctor = Expression.New(typeof(TModel));
             var assignments = new List<MemberAssignment>();
-            foreach (var map in mappings)
+            foreach (var map in Mappings)
             {
                 // add assignment for the model property
                 var property = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
@@ -365,7 +365,7 @@ namespace FluentApiNet.Core
         /// <returns>Mapped entity</returns>
         private TEntity Map(ref TEntity entity, TModel model)
         {
-            foreach (var map in mappings)
+            foreach (var map in Mappings)
             {
                 var modelProperty = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
                 var modelValue = modelProperty.GetValue(model);
@@ -397,7 +397,7 @@ namespace FluentApiNet.Core
             for (int i = 0; i < bits.Length - 1; i++)
             {
                 PropertyInfo propertyToGet = target.GetType().GetProperty(bits[i]);
-                if(propertyToGet.GetValue(target) == null && propertyToGet.PropertyType.IsClass)
+                if (propertyToGet.GetValue(target) == null && propertyToGet.PropertyType.IsClass)
                 {
                     var propertyGetValue = Activator.CreateInstance(propertyToGet.PropertyType);
                     propertyToGet.SetValue(target, propertyGetValue);
@@ -416,7 +416,7 @@ namespace FluentApiNet.Core
         /// <returns>Mapped model</returns>
         private TModel Map(ref TModel model, TEntity entity)
         {
-            foreach (var map in mappings)
+            foreach (var map in Mappings)
             {
                 var entityProperty = typeof(TEntity).GetProperty(map.EntityMember.Member.Name);
                 var modelProperty = typeof(TModel).GetProperty(map.ModelMember.Member.Name);

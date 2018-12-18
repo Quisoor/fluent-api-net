@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FluentApiNet.Core</RootNamespace>
     <AssemblyName>FluentApiNet.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -41,10 +41,10 @@
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="FluentApiNet.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentApiNet.Domain.1.0.1-beta14\lib\net461\FluentApiNet.Domain.dll</HintPath>
+      <HintPath>..\packages\FluentApiNet.Domain.1.0.0\lib\net461\FluentApiNet.Domain.dll</HintPath>
     </Reference>
     <Reference Include="FluentApiNet.Tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentApiNet.Tools.1.0.1-beta15\lib\net461\FluentApiNet.Tools.dll</HintPath>
+      <HintPath>..\packages\FluentApiNet.Tools.1.0.0\lib\net461\FluentApiNet.Tools.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />

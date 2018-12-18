@@ -18,18 +18,18 @@
     <!--*-->
     <description>FluentApiNet.Core</description>
     <!--*-->
-    <releaseNotes>Basical fonctionalities with Get, Create, Update, Delete</releaseNotes>
+    <releaseNotes>Pass to .NET 4.5</releaseNotes>
     <copyright>Copyright 2018 © Aurélien Bretin</copyright>
     <tags>
     </tags>
     <dependencies>
-      <dependency id="FluentApiNet.Domain" version="1.0.0" />
-      <dependency id="FluentApiNet.Tools" version="1.0.0" />
+      <dependency id="FluentApiNet.Domain" version="1.0.1" />
+      <dependency id="FluentApiNet.Tools" version="1.0.1" />
       <dependency id="EntityFramework" version="6.2.0" />
       <dependency id="Z.EntityFramework.Plus.EF6" version="1.8.19" />
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\FluentApiNet.Core.dll" target="lib\net461" />
+    <file src="bin\Release\FluentApiNet.Core.dll" target="lib\net45" />
   </files>
 </package>

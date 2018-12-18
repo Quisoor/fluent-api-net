@@ -1,0 +1,14 @@
+{
+  "ServerUri": "https://sonarcloud.io",
+  "Organization": {
+    "Key": "quisoor-github",
+    "Name": "Aurélien Bretin"
+  },
+  "ProjectKey": "fluent-api-net",
+  "Profiles": {
+    "CSharp": {
+      "ProfileKey": "AWU6Ppz80fxkLA4wTbCc",
+      "ProfileTimestamp": "2018-12-11T09:19:06+01:00"
+    }
+  }
+}

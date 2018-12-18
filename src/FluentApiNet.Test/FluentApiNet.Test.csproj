@@ -82,17 +82,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluentApiNet.Core\FluentApiNet.Core.csproj">
-      <Project>{ce85a20f-35a7-405e-9b06-87774d16f6fb}</Project>
-      <Name>FluentApiNet.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FluentApiNet.Domain\FluentApiNet.Domain.csproj">
-      <Project>{1f97cf06-0e1c-49b0-b8ec-37af4b9a5ab1}</Project>
-      <Name>FluentApiNet.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FluentApiNet.Tools\FluentApiNet.Tools.csproj">
-      <Project>{1a330564-0412-443f-bfd6-a7ced762d92e}</Project>
-      <Name>FluentApiNet.Tools</Name>
+    <ProjectReference Include="..\FluentApiNet\FluentApiNet.csproj">
+      <Project>{03c7bde8-8be3-4db3-b791-3a824ba5c9cf}</Project>
+      <Name>FluentApiNet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

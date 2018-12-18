@@ -28,6 +28,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\FluentApiNet.dll" target="lib\net45" />
+    <file src="bin\Release\FluentApiNet.dll" target="lib\net461" />
   </files>
 </package>

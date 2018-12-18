@@ -14,7 +14,7 @@
     <!--*-->
     <description>FluentApiNet.Domain</description>
     <!--*-->
-    <releaseNotes>Pagination and query tools</releaseNotes>
+    <releaseNotes>Pass to 4.5</releaseNotes>
     <copyright>Copyright 2018 © Aurélien Bretin</copyright>
     <tags>
     </tags>
@@ -22,6 +22,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\FluentApiNet.Domain.dll" target="lib\net461" />
+    <file src="bin\Release\FluentApiNet.Domain.dll"  target="lib\net45" />
   </files>
 </package>

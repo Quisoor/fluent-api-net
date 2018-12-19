@@ -11,7 +11,7 @@
         /// <value>
         /// The identifier model.
         /// </value>
-        public int IdModel { get; set; }
+        public int? IdModel { get; set; }
 
         /// <summary>
         /// Gets or sets the name model.

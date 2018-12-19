@@ -127,6 +127,28 @@ namespace FluentApiNet.Domain.Visitor
         }
 
         /// <summary>
+        /// Visits the children of the <see cref="T:System.Linq.Expressions.BinaryExpression" />.
+        /// </summary>
+        /// <param name="node">The expression to visit.</param>
+        /// <returns>
+        /// The modified expression, if it or any subexpression was modified; otherwise, returns the original expression.
+        /// </returns>
+        protected override Expression VisitBinary(BinaryExpression node)
+        {            
+            var left = base.Visit(node.Left);
+            var right = base.Visit(node.Right);
+            if (IsNullableType(left.Type) && !IsNullableType(right.Type))
+            {
+                right = Expression.Convert(right, left.Type);
+            }
+            if (!IsNullableType(left.Type) && IsNullableType(right.Type))
+            {
+                left = Expression.Convert(left, right.Type);
+            }
+            return Expression.MakeBinary(node.NodeType, left, right);
+        }
+
+        /// <summary>
         /// Translates the parameter.
         /// </summary>
         /// <param name="node">The node.</param>
@@ -179,6 +201,18 @@ namespace FluentApiNet.Domain.Visitor
                 }
             }
             return base.VisitMember(node);
+        }
+
+        /// <summary>
+        /// Determines whether [is nullable type] [the specified t].
+        /// </summary>
+        /// <param name="t">The t.</param>
+        /// <returns>
+        ///   <c>true</c> if [is nullable type] [the specified t]; otherwise, <c>false</c>.
+        /// </returns>
+        private bool IsNullableType(Type t)
+        {
+            return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
     }
 }

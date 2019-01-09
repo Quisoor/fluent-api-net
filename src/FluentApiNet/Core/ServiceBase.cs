@@ -11,24 +11,68 @@ using Z.EntityFramework.Plus;
 
 namespace FluentApiNet.Core
 {
-    public class ServiceBase<TModel, TEntity, TContext>
+    public class ServiceBase
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceBase"/> class.
+        /// </summary>
+        public ServiceBase()
+        {
+            Mappings = new List<Mapping>();         
+        }
+
+        /// <summary>
+        /// Gets or sets the order by.
+        /// </summary>
+        /// <value>
+        /// The order by.
+        /// </value>
+        protected MemberExpression OrderBy { get; set; }
+
+        /// <summary>
+        /// Gets the mappings.
+        /// </summary>
+        /// <value>
+        /// The mappings.
+        /// </value>
+        public List<Mapping> Mappings { get; }
+
+        /// <summary>
+        /// Sets the property.
+        /// </summary>
+        /// <param name="compoundProperty">The compound property.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="value">The value.</param>
+        protected void SetProperty(string compoundProperty, object target, object value)
+        {
+            string[] bits = compoundProperty.Split('.');
+            for (int i = 0; i < bits.Length - 1; i++)
+            {
+                PropertyInfo propertyToGet = target.GetType().GetProperty(bits[i]);
+                if (propertyToGet.GetValue(target) == null && propertyToGet.PropertyType.IsClass)
+                {
+                    var propertyGetValue = Activator.CreateInstance(propertyToGet.PropertyType);
+                    propertyToGet.SetValue(target, propertyGetValue);
+                }
+                target = propertyToGet.GetValue(target, null);
+            }
+            PropertyInfo propertyToSet = target.GetType().GetProperty(bits.Last());
+            propertyToSet.SetValue(target, value, null);
+        }
+    }
+
+    public class ServiceBase<TModel, TEntity, TContext> : ServiceBase
         where TModel : class, new()
         where TEntity : class, new()
         where TContext : DbContext
     {
         /// <summary>
-        /// The translator
-        /// </summary>
-        private readonly TranslationVisitor<Func<TEntity, bool>> translator;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase{TModel, TEntity, TContext}"/> class.
         /// </summary>
-        public ServiceBase()
+        public ServiceBase() : base()
         {
-            Mappings = new List<Mapping>();
             // initialize the translator
-            translator = new TranslationVisitor<Func<TEntity, bool>>();
+            Translator = new TranslationVisitor<Func<TEntity, bool>>();
         }
 
         /// <summary>
@@ -62,20 +106,12 @@ namespace FluentApiNet.Core
         }
 
         /// <summary>
-        /// Gets or sets the order by.
+        /// Gets the translator.
         /// </summary>
         /// <value>
-        /// The order by.
+        /// The translator.
         /// </value>
-        protected MemberExpression OrderBy { get; set; }
-
-        /// <summary>
-        /// Gets the mappings.
-        /// </summary>
-        /// <value>
-        /// The mappings.
-        /// </value>
-        public List<Mapping> Mappings { get; }
+        public TranslationVisitor<Func<TEntity, bool>> Translator { get; }
 
         /// <summary>
         /// Adds the mapping.
@@ -84,7 +120,7 @@ namespace FluentApiNet.Core
         protected void AddMapping(Mapping mapping)
         {
             Mappings.Add(mapping);
-            translator.AddMapping(mapping);
+            Translator.AddMapping(mapping);
         }
 
         /// <summary>
@@ -300,8 +336,8 @@ namespace FluentApiNet.Core
         /// <returns>Query filtered</returns>
         private IQueryable<TEntity> ApplyWhere(IQueryable<TEntity> query, Expression<Func<TModel, bool>> filters)
         {
-            var where = translator.Visit(filters) as LambdaExpression;
-            query = query.Where(Expression.Lambda<Func<TEntity, bool>>(where.Body, translator.EntryParameter));
+            var where = Translator.Visit(filters) as LambdaExpression;
+            query = query.Where(Expression.Lambda<Func<TEntity, bool>>(where.Body, Translator.EntryParameter));
             return query;
         }
 
@@ -316,17 +352,17 @@ namespace FluentApiNet.Core
             MemberExpression orderBy = null;
             if (OrderBy == null && Mappings.Count >= 1)
             {
-                orderBy = translator.Visit(Mappings.First().ModelMember) as MemberExpression;
+                orderBy = Translator.Visit(Mappings.First().ModelMember) as MemberExpression;
             }
             else if (OrderBy != null)
             {
-                orderBy = translator.Visit(OrderBy) as MemberExpression;
+                orderBy = Translator.Visit(OrderBy) as MemberExpression;
             }
 
             // apply expressions
             if (orderBy != null)
             {
-                var lambda = (dynamic)Expression.Lambda(orderBy, translator.EntryParameter);
+                var lambda = (dynamic)Expression.Lambda(orderBy, Translator.EntryParameter);
                 query = Queryable.OrderBy(query, lambda);
             }
 
@@ -347,12 +383,12 @@ namespace FluentApiNet.Core
             {
                 // add assignment for the model property
                 var property = typeof(TModel).GetProperty(map.ModelMember.Member.Name);
-                assignments.Add(Expression.Bind(property, translator.Visit(map.ModelMember)));
+                assignments.Add(Expression.Bind(property, Translator.Visit(map.ModelMember)));
             }
             // initialize the model
             var init = Expression.MemberInit(ctor, assignments.ToArray());
             // create select expression
-            var select = Expression.Lambda<Func<TEntity, TModel>>(init, translator.EntryParameter);
+            var select = Expression.Lambda<Func<TEntity, TModel>>(init, Translator.EntryParameter);
             // apply select expression
             return query.Select(select).ToList();
         }
@@ -383,29 +419,6 @@ namespace FluentApiNet.Core
                 }
             }
             return entity;
-        }
-
-        /// <summary>
-        /// Sets the property.
-        /// </summary>
-        /// <param name="compoundProperty">The compound property.</param>
-        /// <param name="target">The target.</param>
-        /// <param name="value">The value.</param>
-        private void SetProperty(string compoundProperty, object target, object value)
-        {
-            string[] bits = compoundProperty.Split('.');
-            for (int i = 0; i < bits.Length - 1; i++)
-            {
-                PropertyInfo propertyToGet = target.GetType().GetProperty(bits[i]);
-                if (propertyToGet.GetValue(target) == null && propertyToGet.PropertyType.IsClass)
-                {
-                    var propertyGetValue = Activator.CreateInstance(propertyToGet.PropertyType);
-                    propertyToGet.SetValue(target, propertyGetValue);
-                }
-                target = propertyToGet.GetValue(target, null);
-            }
-            PropertyInfo propertyToSet = target.GetType().GetProperty(bits.Last());
-            propertyToSet.SetValue(target, value, null);
         }
 
         /// <summary>

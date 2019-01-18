@@ -137,6 +137,10 @@ namespace FluentApiNet.Domain.Visitor
             {
                 left = Expression.Convert(left, right.Type);
             }
+            if(left.Type != right.Type)
+            {
+                right = Expression.Convert(right, left.Type);
+            }
             return Expression.MakeBinary(node.NodeType, left, right);
         }
 

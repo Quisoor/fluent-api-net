@@ -73,19 +73,6 @@ namespace FluentApiNet.Domain.Visitor
         }
 
         /// <summary>
-        /// Dispatches the expression to one of the more specialized visit methods in this class.
-        /// </summary>
-        /// <param name="node">The expression to visit.</param>
-        /// <returns>
-        /// The modified expression, if it or any subexpression was modified; otherwise, returns the original expression.
-        /// </returns>
-        public override Expression Visit(Expression node)
-        {
-            Debug.WriteLine("Expression : " + node.ToString() + " [=>] " + base.Visit(node));
-            return base.Visit(node);
-        }
-
-        /// <summary>
         /// Visits the children of the <see cref="T:System.Linq.Expressions.Expression`1" />.
         /// </summary>
         /// <typeparam name="T">The type of the delegate.</typeparam>
@@ -108,6 +95,11 @@ namespace FluentApiNet.Domain.Visitor
                 }
             }
             return base.VisitLambda(node);
+        }
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            return Visit(node.Operand);
         }
 
         /// <summary>
@@ -135,8 +127,8 @@ namespace FluentApiNet.Domain.Visitor
         /// </returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {            
-            var left = base.Visit(node.Left);
-            var right = base.Visit(node.Right);
+            var left = Visit(node.Left);
+            var right = Visit(node.Right);
             if (IsNullableType(left.Type) && !IsNullableType(right.Type))
             {
                 right = Expression.Convert(right, left.Type);

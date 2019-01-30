@@ -196,7 +196,17 @@ namespace FluentApiNet.Domain.Visitor
                     }
                 }
             }
-            return base.VisitMember(node);
+            if(node.Member.Name == "Value")
+            {
+                return base.Visit(node.Expression);
+            }
+            var result = base.VisitMember(node);
+            return result;
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            return base.VisitConstant(node);
         }
 
         /// <summary>

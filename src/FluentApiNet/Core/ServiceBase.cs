@@ -14,11 +14,31 @@ namespace FluentApiNet.Core
     public class ServiceBase
     {
         /// <summary>
+        /// The get query method name
+        /// </summary>
+        public const string GetQueryMethodName = "GetQuery";
+
+        /// <summary>
+        /// The default page
+        /// </summary>
+        public const int DefaultPage = 1;
+
+        /// <summary>
+        /// The default page size
+        /// </summary>
+        public const int DefaultPageSize = 25;
+
+        /// <summary>
+        /// The maximum page size
+        /// </summary>
+        public const int MaxPageSize = 100;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase"/> class.
         /// </summary>
         public ServiceBase()
         {
-            Mappings = new List<Mapping>();         
+            Mappings = new List<Mapping>();
         }
 
         /// <summary>

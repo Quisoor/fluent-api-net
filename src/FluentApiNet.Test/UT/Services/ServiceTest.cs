@@ -24,6 +24,21 @@ namespace FluentApiNet.Test.UT.Services
         }
 
         [TestMethod]
+        public void ServiceTest_GetComplex()
+        {
+            var connection = Effort.DbConnectionFactory.CreateTransient();
+            var context = new TestDbContext(connection);
+            context.Users.Add(new Entities.User { IdEntity = 1, NameEntity = "NAME1", RoleEntity = new Role { IdEntity = 1, NameEntity = "ROLE1" } });
+            context.Users.Add(new Entities.User { IdEntity = 2, NameEntity = "NAME2", RoleEntity = new Role { IdEntity = 2, NameEntity = "ROLE2" } });
+            context.Users.Add(new Entities.User { IdEntity = 3, NameEntity = "NAME3", RoleEntity = new Role { IdEntity = 3, NameEntity = "ROLE3" } });
+            context.SaveChanges();
+            var service = new UserService(context);
+            var ids = new List<int> { 1, 2 };
+            var result = service.Get(x => ids.Contains(x.IdModel.Value));
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
         public void ServiceTest_Update()
         {
             var connection = Effort.DbConnectionFactory.CreateTransient();

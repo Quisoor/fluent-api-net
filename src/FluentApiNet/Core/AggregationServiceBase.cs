@@ -12,7 +12,7 @@ namespace FluentApiNet.Core
     /// <summary>
     /// Aggregation service base
     /// </summary>
-    public abstract class AggregationServiceBase<TModel, TJoinResult>
+    public abstract class AggregationServiceBase<TModel, TJoinResult> : IAggregationServiceBase<TModel>
         where TModel : class
         where TJoinResult : class
     {
@@ -30,7 +30,7 @@ namespace FluentApiNet.Core
         /// <value>
         /// The order by.
         /// </value>
-        protected MemberExpression OrderBy { get; set; }
+        protected Expression<Func<TJoinResult, dynamic>> OrderBy { get; set; }
 
         /// <summary>
         /// Gets the mappings.
@@ -82,6 +82,11 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         public Results<TModel> Get(Operations<TModel> operations, int? page, int? pageSize)
         {
+            if(OrderBy == null)
+            {
+                throw new NotSupportedException("OrderBy should be have a value for pagination");
+            }
+
             var visitor = new AggregationWhereVisitor<TModel>(Mappings.Cast<Mapping>().ToList());
             var results = new Results<TModel>();
             Mappings = Mappings.OrderBy(x => x.IsPrimaryKey).ToList();
@@ -120,6 +125,12 @@ namespace FluentApiNet.Core
             #endregion
 
             var query = JoinQuery();
+
+            #region ORDER BY
+
+            query = query.OrderBy(OrderBy);
+
+            #endregion
 
             #region PAGINATION
             results.Count = query.Count();

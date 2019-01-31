@@ -66,7 +66,7 @@ namespace FluentApiNet.Core
         }
     }
 
-    public class ServiceBase<TModel, TEntity, TContext> : ServiceBase
+    public class ServiceBase<TModel, TEntity, TContext> : ServiceBase, IServiceBase<TModel, TEntity>
         where TModel : class, new()
         where TEntity : class, new()
         where TContext : DbContext

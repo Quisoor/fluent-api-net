@@ -12,7 +12,7 @@ namespace FluentApiNet.Core
     /// <summary>
     /// Aggregation service base
     /// </summary>
-    public abstract class AggregationServiceBase<TModel, TJoinResult>
+    public abstract class AggregationServiceBase<TModel, TJoinResult> : IAggregationServiceBase<TModel>
         where TModel : class
         where TJoinResult : class
     {

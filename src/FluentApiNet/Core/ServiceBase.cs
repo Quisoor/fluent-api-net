@@ -14,11 +14,16 @@ namespace FluentApiNet.Core
     public class ServiceBase
     {
         /// <summary>
+        /// The get query method name
+        /// </summary>
+        public const string GetQueryMethodName = "GetQuery";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase"/> class.
         /// </summary>
         public ServiceBase()
         {
-            Mappings = new List<Mapping>();         
+            Mappings = new List<Mapping>();
         }
 
         /// <summary>
@@ -121,6 +126,27 @@ namespace FluentApiNet.Core
         {
             Mappings.Add(mapping);
             Translator.AddMapping(mapping);
+        }
+
+        /// <summary>
+        /// Adds the mapping.
+        /// </summary>
+        /// <param name="modelLambda">The model lambda.</param>
+        /// <param name="entityLambda">The entity lambda.</param>
+        /// <param name="isPrimaryKey">if set to <c>true</c> [is primary key].</param>
+        protected void AddMapping(Expression<Func<TModel, dynamic>> modelLambda, Expression<Func<TEntity, dynamic>> entityLambda, bool isPrimaryKey)
+        {
+            AddMapping(Mapping.Init(modelLambda, entityLambda, true));
+        }
+
+        /// <summary>
+        /// Adds the mapping.
+        /// </summary>
+        /// <param name="modelLambda">The model lambda.</param>
+        /// <param name="entityLambda">The entity lambda.</param>
+        protected void AddMapping(Expression<Func<TModel, dynamic>> modelLambda, Expression<Func<TEntity, dynamic>> entityLambda)
+        {
+            AddMapping(Mapping.Init(modelLambda, entityLambda));
         }
 
         /// <summary>

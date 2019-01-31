@@ -1,7 +1,5 @@
-﻿using FluentApiNet.Core;
-using FluentApiNet.Domain.Visitor;
+﻿using FluentApiNet.Domain.Visitor;
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace FluentApiNet.Domain
@@ -34,22 +32,6 @@ namespace FluentApiNet.Domain
         ///   <c>true</c> if this instance is primary key; otherwise, <c>false</c>.
         /// </value>
         public bool IsPrimaryKey { get; set; }
-
-        /// <summary>
-        /// Gets or sets the attached service.
-        /// </summary>
-        /// <value>
-        /// The attached service.
-        /// </value>
-        public ServiceBase AttachedService { get; set; }
-
-        /// <summary>
-        /// Gets or sets the attached query.
-        /// </summary>
-        /// <value>
-        /// The attached query.
-        /// </value>
-        public IQueryable AttachedQuery { get; set; }
 
         /// <summary>
         /// Sets the specified model lambda.

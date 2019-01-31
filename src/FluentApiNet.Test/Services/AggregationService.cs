@@ -68,6 +68,16 @@ namespace FluentApiNet.Test.Services
                     x => x.UserId,
                     (x, Locations) => new AggregationJoinResult { User = x, Locations = Locations });
         }
+
+        /// <summary>
+        /// Orders the query.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        protected override IOrderedQueryable<AggregationJoinResult> OrderQuery(IQueryable<AggregationJoinResult> query)
+        {
+            return query.OrderBy(x => x.User.Id);
+        }
     }
 
     /// <summary>

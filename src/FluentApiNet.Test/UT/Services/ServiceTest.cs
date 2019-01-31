@@ -1,4 +1,5 @@
-﻿using FluentApiNet.Test.Database;
+﻿using FluentApiNet.Domain;
+using FluentApiNet.Test.Database;
 using FluentApiNet.Test.Entities;
 using FluentApiNet.Test.Models;
 using FluentApiNet.Test.Services;
@@ -16,7 +17,7 @@ namespace FluentApiNet.Test.UT.Services
         {
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDbContext(connection);
-            context.Users.Add(new Entities.User { IdEntity = 1, NameEntity = "NAME1", RoleEntity = new Role { IdEntity = 1, NameEntity = "ROLE" } });
+            context.Users.Add(new Entities.User { Id = 1, Name = "NAME1", Role = new Role { Id = 1, Name = "ROLE" } });
             context.SaveChanges();
             var service = new UserService(context);
             var result = service.Get(x => x.IdModel == 1);
@@ -28,9 +29,9 @@ namespace FluentApiNet.Test.UT.Services
         {
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDbContext(connection);
-            context.Users.Add(new Entities.User { IdEntity = 1, NameEntity = "NAME1", RoleEntity = new Role { IdEntity = 1, NameEntity = "ROLE1" } });
-            context.Users.Add(new Entities.User { IdEntity = 2, NameEntity = "NAME2", RoleEntity = new Role { IdEntity = 2, NameEntity = "ROLE2" } });
-            context.Users.Add(new Entities.User { IdEntity = 3, NameEntity = "NAME3", RoleEntity = new Role { IdEntity = 3, NameEntity = "ROLE3" } });
+            context.Users.Add(new Entities.User { Id = 1, Name = "NAME1", Role = new Role { Id = 1, Name = "ROLE1" } });
+            context.Users.Add(new Entities.User { Id = 2, Name = "NAME2", Role = new Role { Id = 2, Name = "ROLE2" } });
+            context.Users.Add(new Entities.User { Id = 3, Name = "NAME3", Role = new Role { Id = 3, Name = "ROLE3" } });
             context.SaveChanges();
             var service = new UserService(context);
             var ids = new List<int> { 1, 2 };
@@ -43,15 +44,15 @@ namespace FluentApiNet.Test.UT.Services
         {
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDbContext(connection);
-            context.Users.Add(new User { IdEntity = 1, NameEntity = "NAME1", RoleEntity = new Role { IdEntity = 1, NameEntity = "ROLE1" } });
+            context.Users.Add(new User { Id = 1, Name = "NAME1", Role = new Role { Id = 1, Name = "ROLE1" } });
             context.SaveChanges();
             var service = new UserService(context);
             service.Update(new UserModel { IdModel = 1, NameModel = "Modified", RoleModel = "ROLE2" });
-            var updated = context.Users.Single(x => x.IdEntity == 1);
-            var expected = new User { IdEntity = 1, NameEntity = "Modified", RoleEntity = new Role { NameEntity = "ROLE2" } };
-            Assert.AreEqual(expected.IdEntity, updated.IdEntity);
-            Assert.AreEqual(expected.NameEntity, updated.NameEntity);
-            Assert.AreEqual(expected.RoleEntity.NameEntity, updated.RoleEntity.NameEntity);
+            var updated = context.Users.Single(x => x.Id == 1);
+            var expected = new User { Id = 1, Name = "Modified", Role = new Role { Name = "ROLE2" } };
+            Assert.AreEqual(expected.Id, updated.Id);
+            Assert.AreEqual(expected.Name, updated.Name);
+            Assert.AreEqual(expected.Role.Name, updated.Role.Name);
         }
 
         [TestMethod]
@@ -61,12 +62,12 @@ namespace FluentApiNet.Test.UT.Services
             var context = new TestDbContext(connection);
             var service = new UserService(context);
             service.Create(new Models.UserModel { IdModel = 1, NameModel = "Created", RoleModel = "ROLE" });
-            var created = context.Users.Single(x => x.IdEntity == 1);
-            var expected = new User { IdEntity = 1, NameEntity = "Created" };
-            var expectedRole = new Role { NameEntity = "ROLE" };
-            Assert.AreEqual(expected.IdEntity, created.IdEntity);
-            Assert.AreEqual(expected.NameEntity, created.NameEntity);
-            Assert.AreEqual(expectedRole.NameEntity, created.RoleEntity.NameEntity);
+            var created = context.Users.Single(x => x.Id == 1);
+            var expected = new User { Id = 1, Name = "Created" };
+            var expectedRole = new Role { Name = "ROLE" };
+            Assert.AreEqual(expected.Id, created.Id);
+            Assert.AreEqual(expected.Name, created.Name);
+            Assert.AreEqual(expectedRole.Name, created.Role.Name);
         }
 
         [TestMethod]
@@ -84,21 +85,21 @@ namespace FluentApiNet.Test.UT.Services
             var createds = context.Users.ToList();
             var expecteds = new List<User>
             {
-                new User { IdEntity = 1, NameEntity = "Created1" },
-                new User { IdEntity = 2, NameEntity = "Created2", RoleEntity = new Role{NameEntity = "ROLE1" } }
+                new User { Id = 1, Name = "Created1" },
+                new User { Id = 2, Name = "Created2", Role = new Role{Name = "ROLE1" } }
             };
             foreach (var created in createds)
             {
-                var expected = expecteds.Single(x => x.IdEntity == created.IdEntity);
-                Assert.AreEqual(expected.IdEntity, created.IdEntity);
-                Assert.AreEqual(expected.NameEntity, created.NameEntity);
-                if (expected.RoleEntity is null)
+                var expected = expecteds.Single(x => x.Id == created.Id);
+                Assert.AreEqual(expected.Id, created.Id);
+                Assert.AreEqual(expected.Name, created.Name);
+                if (expected.Role is null)
                 {
-                    Assert.IsNull(created.RoleEntity);
+                    Assert.IsNull(created.Role);
                 }
                 else
                 {
-                    Assert.AreEqual(expected.RoleEntity.NameEntity, created.RoleEntity.NameEntity);
+                    Assert.AreEqual(expected.Role.Name, created.Role.Name);
                 }
             }
         }
@@ -110,8 +111,8 @@ namespace FluentApiNet.Test.UT.Services
             var context = new TestDbContext(connection);
             var entities = new List<User>
             {
-                new User { IdEntity = 1, NameEntity = "Created1", RoleEntity = new Role{IdEntity = 1, NameEntity = "ROLE1" }},
-                new User { IdEntity = 2, NameEntity = "Created2", RoleEntity = new Role{IdEntity = 2, NameEntity = "ROLE2" }}
+                new User { Id = 1, Name = "Created1", Role = new Role{Id = 1, Name = "ROLE1" }},
+                new User { Id = 2, Name = "Created2", Role = new Role{Id = 2, Name = "ROLE2" }}
             };
             context.Users.AddRange(entities);
             context.SaveChanges();
@@ -120,6 +121,30 @@ namespace FluentApiNet.Test.UT.Services
             var actuals = context.Users.ToList();
             var expected = new List<User>();
             Assert.AreEqual(expected.Count, actuals.Count);
+        }
+
+        [TestMethod]
+        public void ServiceTest_Aggregation_Get()
+        {
+            var connection = Effort.DbConnectionFactory.CreateTransient();
+            var context = new TestDbContext(connection);
+            context.Users.Add(new User { Id = 1, Name = "NAME1", Role = new Role { Id = 1, Name = "ROLE1" } });
+            context.Users.Add(new User { Id = 2, Name = "NAME2", Role = new Role { Id = 2, Name = "ROLE2" } });
+            context.Users.Add(new User { Id = 3, Name = "NAME3", Role = new Role { Id = 3, Name = "ROLE3" } });
+            context.Locations.Add(new Location { Id = 1, Name = "PARIS", UserId = 1 });
+            context.Locations.Add(new Location { Id = 2, Name = "MADRID", UserId = 2 });
+            context.Locations.Add(new Location { Id = 3, Name = "LONDON", UserId = 1 });
+            context.SaveChanges();
+            var userService = new UserService(context);
+            var locationService = new LocationService(context);
+            var service = new AggregationService(locationService, userService);
+            var operations = new Operations<AggregationModel>
+            {
+                Where = x => x.Locations.Any(y => y.Name == "PARIS")
+            };
+            var result = service.Get(operations, null, null);
+            Assert.AreEqual(1, result.Count);
+            Assert.IsNotNull(result);
         }
     }
 }

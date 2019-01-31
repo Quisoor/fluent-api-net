@@ -19,21 +19,6 @@ namespace FluentApiNet.Core
         public const string GetQueryMethodName = "GetQuery";
 
         /// <summary>
-        /// The default page
-        /// </summary>
-        public const int DefaultPage = 1;
-
-        /// <summary>
-        /// The default page size
-        /// </summary>
-        public const int DefaultPageSize = 25;
-
-        /// <summary>
-        /// The maximum page size
-        /// </summary>
-        public const int MaxPageSize = 100;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase"/> class.
         /// </summary>
         public ServiceBase()
@@ -141,6 +126,27 @@ namespace FluentApiNet.Core
         {
             Mappings.Add(mapping);
             Translator.AddMapping(mapping);
+        }
+
+        /// <summary>
+        /// Adds the mapping.
+        /// </summary>
+        /// <param name="modelLambda">The model lambda.</param>
+        /// <param name="entityLambda">The entity lambda.</param>
+        /// <param name="isPrimaryKey">if set to <c>true</c> [is primary key].</param>
+        protected void AddMapping(Expression<Func<TModel, dynamic>> modelLambda, Expression<Func<TEntity, dynamic>> entityLambda, bool isPrimaryKey)
+        {
+            AddMapping(Mapping.Init(modelLambda, entityLambda, true));
+        }
+
+        /// <summary>
+        /// Adds the mapping.
+        /// </summary>
+        /// <param name="modelLambda">The model lambda.</param>
+        /// <param name="entityLambda">The entity lambda.</param>
+        protected void AddMapping(Expression<Func<TModel, dynamic>> modelLambda, Expression<Func<TEntity, dynamic>> entityLambda)
+        {
+            AddMapping(Mapping.Init(modelLambda, entityLambda));
         }
 
         /// <summary>

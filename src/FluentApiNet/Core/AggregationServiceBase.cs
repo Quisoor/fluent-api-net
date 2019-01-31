@@ -40,8 +40,46 @@ namespace FluentApiNet.Core
         /// </value>
         public List<MappingAggregator> Mappings { get; set; }
 
+        /// <summary>
+        /// Joins the query.
+        /// </summary>
+        /// <returns></returns>
         protected abstract IQueryable<TJoinResult> JoinQuery();
 
+        /// <summary>
+        /// Haves the clause.
+        /// </summary>
+        /// <param name="member">The member.</param>
+        /// <returns></returns>
+        protected bool HaveClause(Expression<Func<TModel, dynamic>> member)
+        {                 
+            return !Mappings
+                .Where(x => x.ModelMember.Member.Name == (member.Body as MemberExpression).Member.Name)
+                .Where(x => x.AttachedWhere.Body is ConstantExpression)
+                .Select(x => (x.AttachedWhere.Body as ConstantExpression).Value)
+                .Where(x => x is bool)
+                .Any(x => (bool)x);
+        }
+
+        /// <summary>
+        /// Retrieves the query.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <param name="member">The member.</param>
+        /// <returns></returns>
+        protected IQueryable<TEntity> RetrieveQuery<TEntity>(Expression<Func<TModel, dynamic>> member)
+        {
+            var mapping = Mappings.Single(x => x.ModelMember.Member.Name == (member.Body as MemberExpression).Member.Name);
+            return mapping.AttachedQuery.Cast<TEntity>();
+        }
+
+        /// <summary>
+        /// Gets the specified operations.
+        /// </summary>
+        /// <param name="operations">The operations.</param>
+        /// <param name="page">The page.</param>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <returns></returns>
         public Results<TModel> Get(Operations<TModel> operations, int? page, int? pageSize)
         {
             var visitor = new AggregationWhereVisitor<TModel>(Mappings.Cast<Mapping>().ToList());
@@ -77,6 +115,7 @@ namespace FluentApiNet.Core
                     map.AttachedQuery = (IQueryable)queryTemp;
                 }
                 map.AttachedService = service as ServiceBase;
+                map.AttachedWhere = whereExpression as LambdaExpression;
             }
             #endregion
 
@@ -85,8 +124,8 @@ namespace FluentApiNet.Core
             #region PAGINATION
             results.Count = query.Count();
 
-            page = page.HasValue ? page.Value : ServiceBase.DefaultPage;
-            pageSize = pageSize.HasValue ? pageSize.Value <= ServiceBase.MaxPageSize ? pageSize.Value : ServiceBase.MaxPageSize : ServiceBase.DefaultPageSize;
+            page = PaginationTools.LimitPage(page);
+            pageSize = PaginationTools.LimitPageSize(pageSize);
 
             query = query.Skip((page.Value - 1) * pageSize.Value);
             query = query.Take(pageSize.Value);
@@ -154,7 +193,5 @@ namespace FluentApiNet.Core
 
             return results;
         }
-
-
     }
 }

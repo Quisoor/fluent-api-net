@@ -17,7 +17,6 @@ namespace FluentApiNet.Tools
         /// </returns>
         public static bool IsSimple(Type type)
         {
-            Guard.NotNull(type);
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 // nullable type, check if the nested type is simple.
@@ -39,7 +38,6 @@ namespace FluentApiNet.Tools
         /// </returns>
         public static bool IsList(Type type)
         {
-            Guard.NotNull(type);
             return type.GenericTypeArguments.Count() == 1;
         }
 
@@ -50,7 +48,6 @@ namespace FluentApiNet.Tools
         /// <returns></returns>
         public static Type GetListType(Type type)
         {
-            Guard.NotNull(type);
             if (IsList(type))
             {
                 return type.GenericTypeArguments.First();

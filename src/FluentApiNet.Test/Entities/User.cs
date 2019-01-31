@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace FluentApiNet.Test.Entities
 {
@@ -9,36 +9,44 @@ namespace FluentApiNet.Test.Entities
     public class User
     {
         /// <summary>
-        /// Gets or sets the identifier entity.
+        /// Gets or sets the identifier.
         /// </summary>
         /// <value>
-        /// The identifier entity.
+        /// The identifier.
         /// </value>
         [Key]
-        public int IdEntity { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the name entity.
+        /// Gets or sets the name.
         /// </summary>
         /// <value>
-        /// The name entity.
+        /// The name.
         /// </value>
-        public string NameEntity { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the identifier role entity.
+        /// Gets or sets the role identifier.
         /// </summary>
         /// <value>
-        /// The identifier role entity.
+        /// The role identifier.
         /// </value>
-        public int? RoleEntityId { get; set; }
+        public int? RoleId { get; set; }
 
         /// <summary>
-        /// Gets or sets the role entity.
+        /// Gets or sets the role.
         /// </summary>
         /// <value>
-        /// The role entity.
+        /// The role.
         /// </value>
-        public Role RoleEntity { get; set; }
+        public Role Role { get; set; }
+
+        /// <summary>
+        /// Gets or sets the locations.
+        /// </summary>
+        /// <value>
+        /// The locations.
+        /// </value>
+        public ICollection<Location> Locations { get; set; }
     }
 }

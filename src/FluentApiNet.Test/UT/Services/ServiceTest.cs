@@ -146,5 +146,27 @@ namespace FluentApiNet.Test.UT.Services
             Assert.AreEqual(1, result.Count);
             Assert.IsNotNull(result);
         }
+
+
+        [TestMethod]
+        public void ServiceTest_Aggregation_Get_WithoutCondition()
+        {
+            var connection = Effort.DbConnectionFactory.CreateTransient();
+            var context = new TestDbContext(connection);
+            context.Users.Add(new User { Id = 1, Name = "NAME1", Role = new Role { Id = 1, Name = "ROLE1" } });
+            context.Users.Add(new User { Id = 2, Name = "NAME2", Role = new Role { Id = 2, Name = "ROLE2" } });
+            context.Users.Add(new User { Id = 3, Name = "NAME3", Role = new Role { Id = 3, Name = "ROLE3" } });
+            context.Locations.Add(new Location { Id = 1, Name = "PARIS", UserId = 1 });
+            context.Locations.Add(new Location { Id = 2, Name = "MADRID", UserId = 2 });
+            context.Locations.Add(new Location { Id = 3, Name = "LONDON", UserId = 1 });
+            context.SaveChanges();
+            var userService = new UserService(context);
+            var locationService = new LocationService(context);
+            var service = new AggregationService(locationService, userService);
+            var operations = new Operations<AggregationModel>();
+            var result = service.Get(operations, null, null);
+            Assert.AreEqual(3, result.Count);
+            Assert.IsNotNull(result);
+        }
     }
 }

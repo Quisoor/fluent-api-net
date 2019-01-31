@@ -50,13 +50,29 @@ namespace FluentApiNet.Core
         /// <param name="member">The member.</param>
         /// <returns></returns>
         protected bool HaveClause(Expression<Func<TModel, dynamic>> member)
-        {                 
-            return !Mappings
-                .Where(x => x.ModelMember.Member.Name == (member.Body as MemberExpression).Member.Name)
-                .Where(x => x.AttachedWhere.Body is ConstantExpression)
-                .Select(x => (x.AttachedWhere.Body as ConstantExpression).Value)
-                .Where(x => x is bool)
-                .Any(x => (bool)x);
+        {
+            var mapping = Mappings
+                .Single(x => x.ModelMember.Member.Name == (member.Body as MemberExpression).Member.Name);
+            if(mapping.AttachedWhere == null)
+            {
+                return false;
+            }
+            if(mapping.AttachedWhere.Body is ConstantExpression)
+            {
+                var constant = mapping.AttachedWhere.Body as ConstantExpression;
+                if(constant.Value is bool)
+                {
+                    return !(bool)constant.Value;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>

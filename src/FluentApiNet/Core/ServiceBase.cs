@@ -27,14 +27,6 @@ namespace FluentApiNet.Core
         }
 
         /// <summary>
-        /// Gets or sets the order by.
-        /// </summary>
-        /// <value>
-        /// The order by.
-        /// </value>
-        protected MemberExpression OrderBy { get; set; }
-
-        /// <summary>
         /// Gets the mappings.
         /// </summary>
         /// <value>
@@ -66,7 +58,7 @@ namespace FluentApiNet.Core
         }
     }
 
-    public class ServiceBase<TModel, TEntity, TContext> : ServiceBase, IServiceBase<TModel, TEntity>
+    public abstract class ServiceBase<TModel, TEntity, TContext> : ServiceBase, IServiceBase<TModel, TEntity>
         where TModel : class, new()
         where TEntity : class, new()
         where TContext : DbContext
@@ -74,7 +66,7 @@ namespace FluentApiNet.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceBase{TModel, TEntity, TContext}"/> class.
         /// </summary>
-        public ServiceBase() : base()
+        protected ServiceBase() : base()
         {
             // initialize the translator
             Translator = new TranslationVisitor<Func<TEntity, bool>>();
@@ -119,6 +111,12 @@ namespace FluentApiNet.Core
         public TranslationVisitor<Func<TEntity, bool>> Translator { get; }
 
         /// <summary>
+        /// Orders the query if none order by is passed by operations.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract IOrderedQueryable<TEntity> OrderQuery(IQueryable<TEntity> query);
+
+        /// <summary>
         /// Adds the mapping.
         /// </summary>
         /// <param name="mapping">The mapping.</param>
@@ -156,7 +154,7 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         public Results<TModel> Get(Expression<Func<TModel, bool>> filters)
         {
-            return Get(filters, PaginationTools.DEFAULT_PAGE, PaginationTools.DEFAULT_PAGESIZE);
+            return Get(filters, null, null);
         }
 
         /// <summary>
@@ -167,7 +165,7 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         public Results<TModel> Get(Expression<Func<TModel, bool>> filters, int? page)
         {
-            return Get(filters, page, PaginationTools.DEFAULT_PAGESIZE);
+            return Get(filters, page, null);
         }
 
         /// <summary>
@@ -179,13 +177,54 @@ namespace FluentApiNet.Core
         /// <returns></returns>
         public Results<TModel> Get(Expression<Func<TModel, bool>> filters, int? page, int? pageSize)
         {
+            var operations = new Operations<TModel>
+            {
+                Where = filters
+            };
+            return Get(operations, page, pageSize);
+        }
+
+        /// <summary>
+        /// Gets the specified operations.
+        /// </summary>
+        /// <param name="operations">The operations.</param>
+        /// <returns></returns>
+        public Results<TModel> Get(Operations<TModel> operations)
+        {
+            return Get(operations, null, null);
+        }
+
+        /// <summary>
+        /// Gets the specified operations.
+        /// </summary>
+        /// <param name="operations">The operations.</param>
+        /// <param name="page">The page.</param>
+        /// <returns></returns>
+        public Results<TModel> Get(Operations<TModel> operations, int? page)
+        {
+            return Get(operations, page, null);
+        }
+
+        /// <summary>
+        /// Gets the specified operations.
+        /// </summary>
+        /// <param name="operations">The operations.</param>
+        /// <param name="page">The page.</param>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <returns></returns>
+        public Results<TModel> Get(Operations<TModel> operations, int? page, int? pageSize)
+        {
             var results = new Results<TModel>();
 
             // format pagination
             page = PaginationTools.LimitPage(page);
             pageSize = PaginationTools.LimitPageSize(pageSize);
 
-            var query = GetQuery(filters);
+            // apply where
+            var query = GetQuery(operations.Where);
+
+            // apply order by
+            query = ApplyOrderBy(query, operations);
 
             // get the count
             results.Count = query.Count();
@@ -339,8 +378,6 @@ namespace FluentApiNet.Core
             var query = GetQuery();
             // apply the where expression to the query
             query = ApplyWhere(query, filters);
-            // apply order by expression to the query
-            query = ApplyOrderBy(query);
             return query;
         }
 
@@ -371,28 +408,46 @@ namespace FluentApiNet.Core
         /// Applies the order by.
         /// </summary>
         /// <param name="query">The query.</param>
-        /// <returns>Query ordered</returns>
-        private IQueryable<TEntity> ApplyOrderBy(IQueryable<TEntity> query)
+        /// <param name="operations">The operations.</param>
+        /// <returns></returns>
+        private IOrderedQueryable<TEntity> ApplyOrderBy(IQueryable<TEntity> query, Operations<TModel> operations)
         {
-            // get the order by expression
-            MemberExpression orderBy = null;
-            if (OrderBy == null && Mappings.Count >= 1)
+            if (operations.OrderBy.Any() && operations.OrderBy.All(x => x.Body is MemberExpression))
             {
-                orderBy = Translator.Visit(Mappings.First().ModelMember) as MemberExpression;
+                foreach (var orderBy in operations.OrderBy)
+                {
+                    var propertyName = (orderBy.Body as MemberExpression).Member.Name;
+                    var lambda = GetOrderByExpression(Mappings.Single(x => x.ModelMember.Member.Name == propertyName));
+                    if (orderBy == operations.OrderBy.First())
+                    {
+                        query = Queryable.OrderBy(query, lambda);
+                    }
+                    else
+                    {
+                        query = Queryable.ThenBy(query, lambda);
+                    }
+                }
+                return (IOrderedQueryable<TEntity>)query;
             }
-            else if (OrderBy != null)
-            {
-                orderBy = Translator.Visit(OrderBy) as MemberExpression;
-            }
+            query = OrderQuery(query);
+            return (IOrderedQueryable<TEntity>)query;
+        }
 
-            // apply expressions
-            if (orderBy != null)
+        /// <summary>
+        /// Gets the order by expression.
+        /// </summary>
+        /// <param name="map">The map.</param>
+        /// <param name="propertyServiceName">Name of the property service.</param>
+        /// <returns></returns>
+        private dynamic GetOrderByExpression(Mapping map)
+        {
+            if (map == null)
             {
-                var lambda = (dynamic)Expression.Lambda(orderBy, Translator.EntryParameter);
-                query = Queryable.OrderBy(query, lambda);
+                map = Mappings.First();
             }
-
-            return query;
+            var parameter = Expression.Parameter(typeof(TEntity));
+            var member = Expression.MakeMemberAccess(parameter, typeof(TEntity).GetProperty(map.EntityMember.Member.Name));
+            return (dynamic)Expression.Lambda(member, parameter);
         }
 
         /// <summary>

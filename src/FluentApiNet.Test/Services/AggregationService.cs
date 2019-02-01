@@ -76,6 +76,8 @@ namespace FluentApiNet.Test.Services
         /// <returns></returns>
         protected override IOrderedQueryable<AggregationJoinResult> OrderQuery(IQueryable<AggregationJoinResult> query)
         {
+            var operations = new Operations<AggregationModel>();
+            operations.OrderBy.Add(x => x.User.IdModel);
             return query.OrderBy(x => x.User.Id);
         }
     }

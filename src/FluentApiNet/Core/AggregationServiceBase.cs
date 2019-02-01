@@ -22,7 +22,7 @@ namespace FluentApiNet.Core
         protected AggregationServiceBase()
         {
             Mappings = new List<MappingAggregator>();
-        }       
+        }
 
         /// <summary>
         /// Gets the mappings.
@@ -39,7 +39,7 @@ namespace FluentApiNet.Core
         protected abstract IQueryable<TJoinResult> JoinQuery();
 
         /// <summary>
-        /// Orders the query.
+        /// Orders the query if none order by is passed by operations.
         /// </summary>
         /// <returns></returns>
         protected abstract IOrderedQueryable<TJoinResult> OrderQuery(IQueryable<TJoinResult> query);
@@ -53,14 +53,14 @@ namespace FluentApiNet.Core
         {
             var mapping = Mappings
                 .Single(x => x.ModelMember.Member.Name == (member.Body as MemberExpression).Member.Name);
-            if(mapping.AttachedWhere == null)
+            if (mapping.AttachedWhere == null)
             {
                 return false;
             }
-            if(mapping.AttachedWhere.Body is ConstantExpression)
+            if (mapping.AttachedWhere.Body is ConstantExpression)
             {
                 var constant = mapping.AttachedWhere.Body as ConstantExpression;
-                if(constant.Value is bool)
+                if (constant.Value is bool)
                 {
                     return !(bool)constant.Value;
                 }
@@ -137,7 +137,7 @@ namespace FluentApiNet.Core
 
             #region ORDER BY
 
-            query = OrderQuery(query);
+            query = ApplyOrderBy(query, operations);
 
             #endregion
 
@@ -212,6 +212,58 @@ namespace FluentApiNet.Core
             #endregion
 
             return results;
+        }
+
+        /// <summary>
+        /// Applies the order by.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="operations">The operations.</param>
+        /// <returns></returns>
+        private IOrderedQueryable<TJoinResult> ApplyOrderBy(IQueryable<TJoinResult> query, Operations<TModel> operations)
+        {
+            if (operations.OrderBy.Any() && operations.OrderBy.All(x => x.Body is MemberExpression))
+            {
+                foreach (var orderBy in operations.OrderBy)
+                {
+                    var propertyName = ((orderBy.Body as MemberExpression).Expression as MemberExpression).Member.Name;
+                    var propertyServiceName = (orderBy.Body as MemberExpression).Member.Name;
+                    var lambda = GetOrderByExpression(Mappings.Single(x => x.ModelMember.Member.Name == propertyName), propertyServiceName);
+                    if (orderBy == operations.OrderBy.First())
+                    {
+                        query = Queryable.OrderBy(query, lambda);
+                    }
+                    else
+                    {
+                        query = Queryable.ThenBy(query, lambda);
+                    }
+                }
+                return (IOrderedQueryable<TJoinResult>)query;
+            }
+            query = OrderQuery(query);
+            return (IOrderedQueryable<TJoinResult>)query;
+        }
+
+        /// <summary>
+        /// Gets the order by expression.
+        /// </summary>
+        /// <param name="map">The map.</param>
+        /// <param name="propertyServiceName">Name of the property service.</param>
+        /// <returns></returns>
+        private dynamic GetOrderByExpression(MappingAggregator map, string propertyServiceName = null)
+        {
+            var service = GetType().GetProperty(map.EntityMember.Member.Name).GetValue(this);
+            var serviceMappings = service.GetType().GetProperty(nameof(ServiceBase.Mappings)).GetValue(service) as List<Mapping>;
+            var serviceMapping = serviceMappings.First();
+            if (!string.IsNullOrEmpty(propertyServiceName))
+            {
+                serviceMapping = serviceMappings.Single(x => x.ModelMember.Member.Name == propertyServiceName);
+            }
+            var propertyService = map.AttachedQuery.ElementType.GetProperty(serviceMapping.EntityMember.Member.Name);
+            var parameter = Expression.Parameter(typeof(TJoinResult));
+            var leftMember = Expression.MakeMemberAccess(parameter, typeof(TJoinResult).GetProperty(map.ModelMember.Member.Name));
+            var rightMember = Expression.MakeMemberAccess(leftMember, propertyService);
+            return (dynamic)Expression.Lambda(rightMember, parameter);
         }
     }
 }

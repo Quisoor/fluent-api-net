@@ -1,4 +1,5 @@
-﻿using FluentApiNet.Core;
+﻿using System.Linq;
+using FluentApiNet.Core;
 using FluentApiNet.Test.Database;
 using FluentApiNet.Test.Entities;
 using FluentApiNet.Test.Models;
@@ -15,12 +16,21 @@ namespace FluentApiNet.Test.Services
         /// Initializes a new instance of the <see cref="LocationService"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
-        public LocationService(TestDbContext context)
+        public LocationService(TestDbContext context) : base()
         {
             Context = context;
             AddMapping(x => x.Id, x => x.Id, true);
             AddMapping(x => x.Name, x => x.Name);
         }
 
+        /// <summary>
+        /// Orders the query if none order by is passed by operations.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        protected override IOrderedQueryable<Location> OrderQuery(IQueryable<Location> query)
+        {
+            return query.OrderBy(x => x.Id);
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace FluentApiNet.Domain
         public Operations()
         {
             Selects = new List<Expression<Func<TModel, dynamic>>>();
+            OrderBy = new List<Expression<Func<TModel, dynamic>>>();
         }
 
         /// <summary>
@@ -29,15 +30,7 @@ namespace FluentApiNet.Domain
         /// <value>
         /// The order by.
         /// </value>
-        public Expression<Func<TModel, dynamic>> OrderBy { get; set; }
-
-        /// <summary>
-        /// Gets or sets the then by.
-        /// </summary>
-        /// <value>
-        /// The then by.
-        /// </value>
-        public Expression<Func<TModel, dynamic>> ThenBy { get; set; }
+        public List<Expression<Func<TModel, dynamic>>> OrderBy { get; set; }
 
         /// <summary>
         /// Gets or sets the select.

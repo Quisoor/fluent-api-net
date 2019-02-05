@@ -191,7 +191,7 @@ namespace FluentApiNet.Test.UT.Services
             var result = service.Get(operations, null, null);
             Assert.IsNotNull(result);
             Assert.AreEqual(3, result.Count);
-            Assert.AreEqual("NAME1", result.Result.First().User.NameModel);
+            Assert.AreEqual(1, result.Result.First().User.IdModel);
         }
 
         [TestMethod]

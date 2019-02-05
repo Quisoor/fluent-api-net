@@ -4,6 +4,7 @@ using FluentApiNet.Test.Entities;
 using FluentApiNet.Test.Models;
 using FluentApiNet.Test.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -175,8 +176,8 @@ namespace FluentApiNet.Test.UT.Services
             var connection = Effort.DbConnectionFactory.CreateTransient();
             var context = new TestDbContext(connection);
             context.Users.Add(new User { Id = 1, Name = "NAME3", Role = new Role { Id = 1, Name = "ROLE1" } });
-            context.Users.Add(new User { Id = 2, Name = "NAME2", Role = new Role { Id = 2, Name = "ROLE2" } });
-            context.Users.Add(new User { Id = 3, Name = "NAME1", Role = new Role { Id = 3, Name = "ROLE3" } });
+            context.Users.Add(new User { Id = 2, Name = "NAME4", Role = new Role { Id = 2, Name = "ROLE2" } });
+            context.Users.Add(new User { Id = 3, Name = "NAME3", Role = new Role { Id = 3, Name = "ROLE3" } });
             context.Locations.Add(new Location { Id = 1, Name = "PARIS", UserId = 1 });
             context.Locations.Add(new Location { Id = 2, Name = "MADRID", UserId = 2 });
             context.Locations.Add(new Location { Id = 3, Name = "LONDON", UserId = 1 });
@@ -186,10 +187,38 @@ namespace FluentApiNet.Test.UT.Services
             var service = new AggregationService(locationService, userService);
             var operations = new Operations<AggregationModel>();
             operations.OrderBy.Add(x => x.User.NameModel);
+            operations.OrderBy.Add(x => x.User.RoleModel);
             var result = service.Get(operations, null, null);
             Assert.IsNotNull(result);
             Assert.AreEqual(3, result.Count);
-            Assert.AreEqual("NAME1", result.Result.First().User.NameModel);
+            Assert.AreEqual(1, result.Result.First().User.IdModel);
+        }
+
+        [TestMethod]
+        public void ServiceTest_Aggregation_Get_Complex()
+        {
+            var connection = Effort.DbConnectionFactory.CreateTransient();
+            var context = new TestDbContext(connection);
+            context.Users.Add(new User { Id = 1, Name = "NAME1", Role = new Role { Id = 1, Name = "ROLE1" } });
+            context.Users.Add(new User { Id = 2, Name = "NAME2", Role = new Role { Id = 2, Name = "ROLE2" } });
+            context.Users.Add(new User { Id = 3, Name = "NAME3", Role = new Role { Id = 3, Name = "ROLE3" } });
+            context.Locations.Add(new Location { Id = 1, Name = "PARIS", UserId = 1 });
+            context.Locations.Add(new Location { Id = 2, Name = "MADRID", UserId = 2 });
+            context.Locations.Add(new Location { Id = 3, Name = "LONDON", UserId = 1 });
+            context.SaveChanges();
+            var search = "1";
+            int id = 0;
+            int.TryParse(search, out id);
+            var userService = new UserService(context);
+            var locationService = new LocationService(context);
+            var service = new AggregationService(locationService, userService);
+            var operations = new Operations<AggregationModel>
+            {
+                Where = x => x.Locations.Any(y => y.Name == "PARIS") && x.User.IdModel == id
+            };
+            var result = service.Get(operations, null, null);
+            Assert.AreEqual(1, result.Count);
+            Assert.IsNotNull(result);
         }
     }
 }

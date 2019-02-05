@@ -235,7 +235,7 @@ namespace FluentApiNet.Core
                     }
                     else
                     {
-                        query = Queryable.ThenBy(query, lambda);
+                        query = Queryable.ThenBy((IOrderedQueryable<TJoinResult>)query, lambda);
                     }
                 }
                 return (IOrderedQueryable<TJoinResult>)query;

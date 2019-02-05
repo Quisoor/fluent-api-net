@@ -88,6 +88,10 @@ namespace FluentApiNet.Domain.Visitor.Aggregation
             }
             else
             {
+                if(node.Object == null)
+                {
+                    return base.VisitMethodCall(node);
+                }
                 // translate left part only
                 var left = Visit(node.Object);
                 if (left != null)
@@ -177,7 +181,7 @@ namespace FluentApiNet.Domain.Visitor.Aggregation
                 return null;
             }
             return base.VisitMember(node);
-        }
+        }        
 
         /// <summary>
         /// Visits the <see cref="T:System.Linq.Expressions.ParameterExpression" />.

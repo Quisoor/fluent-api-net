@@ -7,7 +7,8 @@
 
 |**Version**|**Downloads**|
 |--|--|
-| [![nuget](https://img.shields.io/nuget/v/FluentApiNet.Core.svg)](https://www.nuget.org/packages/FluentApiNet/) | [![nuget](https://img.shields.io/nuget/dt/FluentApiNet.Core.svg)](https://www.nuget.org/packages/FluentApiNet/) |
+| [![nuget](https://img.shields.io/nuget/v/FluentApiNet.svg)](https://www.nuget.org/packages/FluentApiNet/) | [![nuget](https://img.shields.io/nuget/dt/FluentApiNet.svg)](https://www.nuget.org/packages/FluentApiNet/) |
+| [![nuget](https://img.shields.io/nuget/vpre/FluentApiNet.svg)](https://www.nuget.org/packages/FluentApiNet/) |  |
 
 ## Description
 

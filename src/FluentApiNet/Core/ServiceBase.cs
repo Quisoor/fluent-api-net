@@ -396,8 +396,11 @@ namespace FluentApiNet.Core
         {
             // get basic query of the repository
             var query = GetQuery();
-            // apply the where expression to the query
-            query = ApplyWhere(query, filters);
+            if (filters != null)
+            {
+                // apply the where expression to the query
+                query = ApplyWhere(query, filters);
+            }
             return query;
         }
 
@@ -478,6 +481,7 @@ namespace FluentApiNet.Core
         private List<TModel> ApplySelect(IQueryable<TEntity> query)
         {
             // new TModel()
+            Translator.EntryParameter = Expression.Parameter(typeof(TEntity));
             var ctor = Expression.New(typeof(TModel));
             var assignments = new List<MemberAssignment>();
             foreach (var map in Mappings)

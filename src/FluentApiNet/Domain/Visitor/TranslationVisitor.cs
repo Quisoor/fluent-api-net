@@ -111,11 +111,7 @@ namespace FluentApiNet.Domain.Visitor
         /// </returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (node.Name == EntryParameter.Name)
-            {
-                return EntryParameter;
-            }
-            return base.VisitParameter(node);
+            return EntryParameter;
         }
 
         /// <summary>
@@ -126,7 +122,7 @@ namespace FluentApiNet.Domain.Visitor
         /// The modified expression, if it or any subexpression was modified; otherwise, returns the original expression.
         /// </returns>
         protected override Expression VisitBinary(BinaryExpression node)
-        {            
+        {
             var left = Visit(node.Left);
             var right = Visit(node.Right);
             if (IsNullableType(left.Type) && !IsNullableType(right.Type))
@@ -137,7 +133,7 @@ namespace FluentApiNet.Domain.Visitor
             {
                 left = Expression.Convert(left, right.Type);
             }
-            if(left.Type != right.Type)
+            if (left.Type != right.Type)
             {
                 right = Expression.Convert(right, left.Type);
             }
@@ -171,13 +167,13 @@ namespace FluentApiNet.Domain.Visitor
         /// </returns>
         protected override Expression VisitMember(MemberExpression node)
         {
-            if ((node.Expression as ParameterExpression)?.Name == EntryParameter.Name)
+            if (node.Expression is ParameterExpression)
             {
                 var param = this.Visit(node.Expression) as ParameterExpression;
                 MemberExpression mapping = null;
                 if (node.Member.DeclaringType == entityType && !modelToEntity)
                 {
-                    mapping = mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember;                    
+                    mapping = mappings.Single(x => x.EntityMember.Member.Name == node.Member.Name).ModelMember;
                 }
                 if (node.Member.DeclaringType == modelType && modelToEntity)
                 {
@@ -196,7 +192,7 @@ namespace FluentApiNet.Domain.Visitor
                     }
                 }
             }
-            if(node.Member.Name == "Value")
+            if (node.Member.Name == "Value")
             {
                 return base.Visit(node.Expression);
             }

@@ -23,6 +23,23 @@ namespace FluentApiNet.Test.UT.Services
             var service = new UserService(context);
             var result = service.Get(x => x.IdModel == 1);
             Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Result.Count);
+        }
+
+
+        [TestMethod]
+        public void ServiceTest_GetAll()
+        {
+            var connection = Effort.DbConnectionFactory.CreateTransient();
+            var context = new TestDbContext(connection);
+            context.Users.Add(new Entities.User { Id = 1, Name = "NAME1", Role = new Role { Id = 1, Name = "ROLE" } });
+            context.Users.Add(new Entities.User { Id = 2, Name = "NAME1", Role = new Role { Id = 2, Name = "ROLE" } });
+            context.Users.Add(new Entities.User { Id = 3, Name = "NAME1", Role = new Role { Id = 3, Name = "ROLE" } });
+            context.SaveChanges();
+            var service = new UserService(context);
+            var result = service.Get();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3, result.Result.Count);
         }
 
         [TestMethod]

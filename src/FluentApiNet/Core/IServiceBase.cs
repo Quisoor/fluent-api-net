@@ -75,7 +75,7 @@ namespace FluentApiNet.Core
         /// Get all
         /// </summary>
         /// <returns>Results</returns>
-        public Results<TModel> Get();
+        Results<TModel> Get();
 
         /// <summary>
         /// Get all pagined
@@ -83,7 +83,7 @@ namespace FluentApiNet.Core
         /// <param name="page"></param>
         /// <param name="pageSize"></param>
         /// <returns>Results</returns>
-        public Results<TModel> Get(int? page, int? pageSize);
+        Results<TModel> Get(int? page, int? pageSize);
 
         /// <summary>
         /// Gets the specified operations.

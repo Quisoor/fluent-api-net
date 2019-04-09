@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace FluentApiNet.Test.Entities
 {
     /// <summary>
-    /// User entity class
+    /// Role class entity
     /// </summary>
-    public class User
+    public class Role
     {
         /// <summary>
         /// Gets or sets the identifier.
@@ -26,27 +27,11 @@ namespace FluentApiNet.Test.Entities
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the role identifier.
+        /// Gets or sets the users.
         /// </summary>
         /// <value>
-        /// The role identifier.
+        /// The users.
         /// </value>
-        public int? RoleId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the role.
-        /// </summary>
-        /// <value>
-        /// The role.
-        /// </value>
-        public Role Role { get; set; }
-
-        /// <summary>
-        /// Gets or sets the locations.
-        /// </summary>
-        /// <value>
-        /// The locations.
-        /// </value>
-        public ICollection<Location> Locations { get; set; }
+        public virtual ICollection<User> Users { get; set; }
     }
 }

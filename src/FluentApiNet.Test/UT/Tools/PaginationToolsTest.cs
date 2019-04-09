@@ -26,7 +26,7 @@ namespace FluentApiNet.Test.UT.Tools
         public void LimitPageSize_Null()
         {
             var actual = PaginationTools.LimitPageSize(null);
-            var expected = 25;
+            int? expected = null;
             Assert.AreEqual(expected, actual);
         }
 
@@ -34,7 +34,7 @@ namespace FluentApiNet.Test.UT.Tools
         public void LimitPageSize_InferiorToZero()
         {
             var actual = PaginationTools.LimitPageSize(-1);
-            var expected = 25;
+            int? expected = null;
             Assert.AreEqual(expected, actual);
         }
     }

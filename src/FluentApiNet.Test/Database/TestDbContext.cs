@@ -28,6 +28,22 @@ namespace FluentApiNet.Test.Database
         public DbSet<User> Users { get; set; }
 
         /// <summary>
+        /// Gets or sets the roles.
+        /// </summary>
+        /// <value>
+        /// The roles.
+        /// </value>
+        public DbSet<Role> Roles { get; set; }
+
+        /// <summary>
+        /// Gets or sets the locations.
+        /// </summary>
+        /// <value>
+        /// The locations.
+        /// </value>
+        public DbSet<Location> Locations { get; set; }
+
+        /// <summary>
         /// This method is called when the model for a derived context has been initialized, but
         /// before the model has been locked down and used to initialize the context.  The default
         /// implementation of this method does nothing, but it can be overridden in a derived class
@@ -44,7 +60,7 @@ namespace FluentApiNet.Test.Database
         /// </remarks>
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasKey(x => x.IdEntity);
+            modelBuilder.Entity<User>().HasKey(x => x.Id);
         }
 
     }

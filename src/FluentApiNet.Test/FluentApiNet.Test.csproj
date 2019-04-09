@@ -20,6 +20,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,12 +62,22 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.8.19.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.EntityFramework.Plus.EF6.1.8.19\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\TestDbContext.cs" />
+    <Compile Include="Entities\Location.cs" />
+    <Compile Include="Entities\Role.cs" />
     <Compile Include="Entities\User.cs" />
+    <Compile Include="Models\AggregationModel.cs" />
+    <Compile Include="Models\LocationModel.cs" />
+    <Compile Include="Models\RoleModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AggregationService.cs" />
+    <Compile Include="Services\LocationService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="UT\Tools\PaginationToolsTest.cs" />
     <Compile Include="UT\Services\ServiceTest.cs" />
@@ -76,20 +87,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluentApiNet.Abstract\FluentApiNet.Abstract.csproj">
-      <Project>{0774B5F3-A439-4807-B533-8D748B6770F5}</Project>
-      <Name>FluentApiNet.Abstract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FluentApiNet.Core\FluentApiNet.Core.csproj">
-      <Project>{ce85a20f-35a7-405e-9b06-87774d16f6fb}</Project>
-      <Name>FluentApiNet.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FluentApiNet.Tools\FluentApiNet.Tools.csproj">
-      <Project>{1A330564-0412-443F-BFD6-A7CED762D92E}</Project>
-      <Name>FluentApiNet.Tools</Name>
+    <ProjectReference Include="..\FluentApiNet\FluentApiNet.csproj">
+      <Project>{03c7bde8-8be3-4db3-b791-3a824ba5c9cf}</Project>
+      <Name>FluentApiNet</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

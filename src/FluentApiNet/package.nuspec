@@ -1,11 +1,11 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <package>
   <metadata>
     <!--*-->
-    <id>FluentApiNet.Core</id>
+    <id>FluentApiNet</id>
     <!--*-->
-    <version>0.0.1-alpha001</version>
-    <title>FluentApiNet.Core</title>
+    <version>1.0.0</version>
+    <title>FluentApiNet</title>
     <!--*-->
     <authors>Aurélien Bretin</authors>
     <owners>Aurélien Bretin</owners>
@@ -16,16 +16,18 @@
     -->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <!--*-->
-    <description>FluentApiNet.Core</description>
+    <description>FluentApiNet</description>
     <!--*-->
-    <releaseNotes> </releaseNotes>
+    <releaseNotes></releaseNotes>
     <copyright>Copyright 2018 © Aurélien Bretin</copyright>
-    <tags> </tags>
+    <tags>
+    </tags>
     <dependencies>
       <dependency id="EntityFramework" version="6.2.0" />
+      <dependency id="Z.EntityFramework.Plus.EF6" version="1.8.19" />
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\FluentApiNet.Core.dll" target="lib\net461" />
+    <file src="bin\Release\FluentApiNet.dll" target="lib\net461" />
   </files>
 </package>

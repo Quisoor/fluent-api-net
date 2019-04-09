@@ -6,14 +6,28 @@
     public static class PaginationTools
     {
         /// <summary>
-        /// The default page
+        /// Gets or sets the default page.
         /// </summary>
-        public const int DEFAULT_PAGE = 1;
+        /// <value>
+        /// The default page.
+        /// </value>
+        public static int DEFAULT_PAGE { get; set; } = 1;
 
         /// <summary>
-        /// The default pagesize
+        /// Gets or sets the default pagesize.
         /// </summary>
-        public const int DEFAULT_PAGESIZE = 25;
+        /// <value>
+        /// The default pagesize.
+        /// </value>
+        public static int? DEFAULT_PAGESIZE { get; set; } = null;
+
+        /// <summary>
+        /// Gets or sets the maximum pagesize.
+        /// </summary>
+        /// <value>
+        /// The maximum pagesize.
+        /// </value>
+        public static int MAX_PAGESIZE { get; set; } = 100;
 
         /// <summary>
         /// Limits the page.
@@ -37,11 +51,18 @@
         /// </summary>
         /// <param name="pageSize">Size of the page.</param>
         /// <returns>Limited page size</returns>
-        public static int LimitPageSize(int? pageSize)
+        public static int? LimitPageSize(int? pageSize)
         {
             if (pageSize.HasValue && pageSize.Value >= 0)
             {
-                return pageSize.Value;
+                if (pageSize.Value <= MAX_PAGESIZE)
+                {
+                    return pageSize.Value;
+                }
+                else
+                {
+                    return MAX_PAGESIZE;
+                }
             }
             else
             {

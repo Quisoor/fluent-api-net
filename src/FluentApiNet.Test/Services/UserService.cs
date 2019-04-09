@@ -1,5 +1,6 @@
-﻿using FluentApiNet.Abstract;
+﻿using System.Linq;
 using FluentApiNet.Core;
+using FluentApiNet.Domain;
 using FluentApiNet.Test.Database;
 using FluentApiNet.Test.Entities;
 using FluentApiNet.Test.Models;
@@ -16,13 +17,24 @@ namespace FluentApiNet.Test.Services
         /// Initializes a new instance of the <see cref="UserService"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
-        public UserService(TestDbContext context)
+        public UserService(TestDbContext context) : base()
         {
-            this.Context = context;
+            Context = context;
 
             // mapping
-            Mappings.Add(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.IdEntity));
-            Mappings.Add(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.NameEntity));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.IdModel, x => x.Id, true));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.NameModel, x => x.Name));
+            AddMapping(Mapping.Init<UserModel, User>(x => x.RoleModel, x => x.Role.Name));
+        }
+
+        /// <summary>
+        /// Orders the query if none order by is passed by operations.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        protected override IOrderedQueryable<User> OrderQuery(IQueryable<User> query)
+        {
+            return query.OrderBy(x => x.Id);
         }
     }
 }

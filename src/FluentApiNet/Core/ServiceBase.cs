@@ -230,7 +230,7 @@ namespace FluentApiNet.Core
             results.Count = query.Count();
 
             // apply pagination
-            query = query.Pagine(page.Value, pageSize.Value);
+            query = query.Pagine(page.Value, pageSize);
 
             // get the results
             results.Result = ApplySelect(query);

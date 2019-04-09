@@ -185,6 +185,26 @@ namespace FluentApiNet.Core
         }
 
         /// <summary>
+        /// Get all
+        /// </summary>
+        /// <returns>Results</returns>
+        public Results<TModel> Get()
+        {
+            return Get(page: null, pageSize: null);
+        }
+
+        /// <summary>
+        /// Get all pagined
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <returns>Results</returns>
+        public Results<TModel> Get(int? page, int? pageSize)
+        {
+            return Get(new Operations<TModel>(), page, pageSize);
+        }
+
+        /// <summary>
         /// Gets the specified operations.
         /// </summary>
         /// <param name="operations">The operations.</param>
@@ -376,8 +396,11 @@ namespace FluentApiNet.Core
         {
             // get basic query of the repository
             var query = GetQuery();
-            // apply the where expression to the query
-            query = ApplyWhere(query, filters);
+            if (filters != null)
+            {
+                // apply the where expression to the query
+                query = ApplyWhere(query, filters);
+            }
             return query;
         }
 
@@ -458,6 +481,7 @@ namespace FluentApiNet.Core
         private List<TModel> ApplySelect(IQueryable<TEntity> query)
         {
             // new TModel()
+            Translator.EntryParameter = Expression.Parameter(typeof(TEntity));
             var ctor = Expression.New(typeof(TModel));
             var assignments = new List<MemberAssignment>();
             foreach (var map in Mappings)

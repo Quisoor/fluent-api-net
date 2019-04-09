@@ -88,6 +88,26 @@ namespace FluentApiNet.Core
         }
 
         /// <summary>
+        /// Get all
+        /// </summary>
+        /// <returns>Results</returns>
+        public Results<TModel> Get()
+        {
+            return Get(page: null, pageSize: null);
+        }
+
+        /// <summary>
+        /// Get all pagined
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <returns>Results</returns>
+        public Results<TModel> Get(int? page, int? pageSize)
+        {
+            return Get(new Operations<TModel>(), page, pageSize);
+        }
+
+        /// <summary>
         /// Gets the specified operations.
         /// </summary>
         /// <param name="operations">The operations.</param>

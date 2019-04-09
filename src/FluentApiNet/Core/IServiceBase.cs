@@ -72,6 +72,20 @@ namespace FluentApiNet.Core
         Results<TModel> Get(Expression<Func<TModel, bool>> filters, int? page, int? pageSize);
 
         /// <summary>
+        /// Get all
+        /// </summary>
+        /// <returns>Results</returns>
+        Results<TModel> Get();
+
+        /// <summary>
+        /// Get all pagined
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <returns>Results</returns>
+        Results<TModel> Get(int? page, int? pageSize);
+
+        /// <summary>
         /// Gets the specified operations.
         /// </summary>
         /// <param name="operations">The operations.</param>

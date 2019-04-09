@@ -147,8 +147,7 @@ namespace FluentApiNet.Core
             page = PaginationTools.LimitPage(page);
             pageSize = PaginationTools.LimitPageSize(pageSize);
 
-            query = query.Skip((page.Value - 1) * pageSize.Value);
-            query = query.Take(pageSize.Value);
+            query = query.Pagine(page.Value, pageSize);
 
             #endregion
 

@@ -19,7 +19,7 @@
         /// <value>
         /// The default pagesize.
         /// </value>
-        public static int DEFAULT_PAGESIZE { get; set; } = 25;
+        public static int? DEFAULT_PAGESIZE { get; set; } = null;
 
         /// <summary>
         /// Gets or sets the maximum pagesize.
@@ -51,7 +51,7 @@
         /// </summary>
         /// <param name="pageSize">Size of the page.</param>
         /// <returns>Limited page size</returns>
-        public static int LimitPageSize(int? pageSize)
+        public static int? LimitPageSize(int? pageSize)
         {
             if (pageSize.HasValue && pageSize.Value >= 0)
             {

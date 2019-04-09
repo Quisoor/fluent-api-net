@@ -15,11 +15,18 @@ namespace FluentApiNet.Tools
         /// <param name="page">The page.</param>
         /// <param name="pageSize">Size of the page.</param>
         /// <returns>Pagined query</returns>
-        public static IQueryable<TEntity> Pagine<TEntity>(this IQueryable<TEntity> query, int page, int pageSize)
+        public static IQueryable<TEntity> Pagine<TEntity>(this IQueryable<TEntity> query, int page, int? pageSize)
         {
-            var skip = (page - 1) * pageSize;
-            var take = pageSize;
-            return query.Skip(skip).Take(take);
+            if (pageSize.HasValue)
+            {
+                var skip = (page - 1) * pageSize.Value;
+                var take = pageSize.Value;
+                return query.Skip(skip).Take(take);
+            }
+            else
+            {
+                return query;
+            }
         }
     }
 }
